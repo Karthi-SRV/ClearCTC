@@ -24,23 +24,6 @@ interface AuthContextValue extends AuthState {
   isAuthenticated: boolean;
 }
 
-const LS_TOKEN = 'cc_token';
-const LS_USER  = 'cc_user';
-
-function loadFromStorage(): AuthState {
-  try {
-    const token = localStorage.getItem(LS_TOKEN);
-    const raw   = localStorage.getItem(LS_USER);
-    if (token && raw) {
-      return { token, user: JSON.parse(raw) as AuthUser };
-    }
-  } catch {
-    localStorage.removeItem(LS_TOKEN);
-    localStorage.removeItem(LS_USER);
-  }
-  return { token: null, user: null };
-}
-
 export const AuthContext = createContext<AuthContextValue>({
   token: null,
   user: null,
@@ -50,17 +33,15 @@ export const AuthContext = createContext<AuthContextValue>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>(loadFromStorage);
+  // Auth state lives in React memory only — no browser storage.
+  // Page refresh requires re-login; this is intentional per architecture spec.
+  const [state, setState] = useState<AuthState>({ token: null, user: null });
 
   const login = useCallback((token: string, user: AuthUser) => {
-    localStorage.setItem(LS_TOKEN, token);
-    localStorage.setItem(LS_USER, JSON.stringify(user));
     setState({ token, user });
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(LS_TOKEN);
-    localStorage.removeItem(LS_USER);
     setState({ token: null, user: null });
   }, []);
 

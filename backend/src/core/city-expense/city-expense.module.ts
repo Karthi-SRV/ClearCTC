@@ -38,6 +38,6 @@ import { CityExpenseService } from './city-expense.service.js';
     CityExpenseFetchService,
     CityExpenseService,
   ],
-  exports: [CityExpenseService],
+  exports: [CityExpenseService, REDIS_CLIENT],
 })
 export class CityExpenseModule {}

@@ -3,28 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Company, CompanyDocument } from '../../shared/schemas/company.schema.js';
 import type { AiClient } from '../ai/ai-client.interface.js';
-import { COMPANY_AI_CLIENT } from '../ai/ai-client.interface.js';
+import { COMPANY_AI_CLIENT, GEMINI_QUOTA_EXHAUSTED_PREFIX } from '../ai/ai-client.interface.js';
 import { AiParseError } from '../ai/ai-parse.error.js';
-import { GEMINI_QUOTA_EXHAUSTED_PREFIX } from '../ai/gemini-ai-client.js';
 import type { AiProfile } from './data-source.interface.js';
 import { CompanyFetchService } from './company-fetch.service.js';
 
-interface AiProfileRaw {
-  companySize: string;
-  basicInsurance: string;
-  otherBenefits: string[];
-  pros: string[];
-  cons: string[];
-  riskLevel: string;
-  riskFactors: string[];
-  benefitForRisk: string;
-}
-
-const PROFILE_SYSTEM_PROMPT =
-  'You are a workplace analyst. Summarize the company profile from the ' +
-  'supplied ratings and reviews only. Never invent facts not present in the data. ' +
-  'All claims must cite the review source or rating dimension that drove them. ' +
-  'Return only valid JSON. Start with { and end with }.';
+import { CompanyAiProfileSchema } from '../../shared/schemas/ai-validation.schemas.js';
+import {
+  COMPANY_PROFILE_SYSTEM_PROMPT,
+  buildCompanyProfileUserPrompt,
+} from '../../shared/prompts/prompt-registry.js';
 
 const STALE_DAYS = 90;
 // Gemini free tier: 15 RPM. Sequential calls with a 15-second gap stay safely under.
@@ -115,7 +103,7 @@ export class CompanyAiProfileService implements OnModuleDestroy {
         await this.fetchAndInsertCompany(data.name);
         fetched++;
         this.logger.log(`Company seeded: ${data.name}`);
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (isQuotaExhausted(err)) {
           this.logger.error(
             `Gemini account quota exhausted after ${fetched} companies. ` +
@@ -125,7 +113,7 @@ export class CompanyAiProfileService implements OnModuleDestroy {
           break;
         }
         failed++;
-        this.logger.warn(`Company seed failed for ${data.name}: ${err?.message}`);
+        this.logger.warn(`Company seed failed for ${data.name}: ${err instanceof Error ? err.message : String(err)}`);
       }
       if (i < missing.length - 1) {
         await this.sleep(GEMINI_REQUEST_GAP_MS);
@@ -190,7 +178,7 @@ export class CompanyAiProfileService implements OnModuleDestroy {
           );
           generated++;
           this.logger.log(`aiProfile generated for ${company.name}`);
-        } catch (err: any) {
+        } catch (err: unknown) {
           if (isQuotaExhausted(err)) {
             this.logger.error(
               `Gemini account quota exhausted after ${generated} aiProfiles. ` +
@@ -200,7 +188,7 @@ export class CompanyAiProfileService implements OnModuleDestroy {
             break;
           }
           this.logger.warn(
-            `aiProfile generation failed for ${company.name}: ${err?.message}`,
+            `aiProfile generation failed for ${company.name}: ${err instanceof Error ? err.message : String(err)}`,
           );
         }
         if (i < needsProfile.length - 1) {
@@ -219,29 +207,9 @@ export class CompanyAiProfileService implements OnModuleDestroy {
   private async generateProfile(
     company: Pick<CompanyDocument, 'name' | 'ratings' | 'reviews'>,
   ): Promise<Omit<AiProfile, 'generatedAt'>> {
-    const userPrompt = `Company: "${company.name}"
+    const userPrompt = buildCompanyProfileUserPrompt(company.name, company.ratings, company.reviews);
 
-SEEDED RATINGS (per source):
-${JSON.stringify(company.ratings ?? [])}
-
-SEEDED REVIEWS (snippets):
-${JSON.stringify(company.reviews ?? [])}
-
-Return exactly this JSON object (no extra fields):
-{
-  "companySize": "<headcount band, e.g. Large (50,000+) or Mid-size (1,000–10,000)>",
-  "basicInsurance": "<mediclaim/health insurance typical for this company type>",
-  "otherBenefits": ["<max 3 benefits derived from review text or company reputation>"],
-  "pros": ["<max 4 items — each must cite which review text or rating dimension drove it>"],
-  "cons": ["<max 4 items — each must cite which review text or rating dimension drove it>"],
-  "riskLevel": "<low|medium|high — low if jobSecurity > 4.0 across sources, high if < 3.2, else medium>",
-  "riskFactors": ["<max 3 factors citing jobSecurity rating or specific review text>"],
-  "benefitForRisk": "<one sentence weighing what the company offers against its risk level>"
-}
-
-RULES: Pros and cons must be grounded in the supplied reviews or ratings only. If a field cannot be determined, output "Not available in data". Output only the JSON object.`;
-
-    const raw = await this.ai.call(PROFILE_SYSTEM_PROMPT, userPrompt);
+    const raw = await this.ai.call(COMPANY_PROFILE_SYSTEM_PROMPT, userPrompt);
     return this.validateProfileResponse(raw, company.name);
   }
 
@@ -249,42 +217,10 @@ RULES: Pros and cons must be grounded in the supplied reviews or ratings only. I
     raw: object,
     companyName: string,
   ): Omit<AiProfile, 'generatedAt'> {
-    const r = raw as AiProfileRaw;
-
-    if (typeof r.companySize !== 'string' || !r.companySize) {
-      throw new AiParseError(`Missing companySize for ${companyName}`);
+    try {
+      return CompanyAiProfileSchema.parse(raw);
+    } catch (err: any) {
+      throw new AiParseError(`aiProfile validation failed for ${companyName}: ${err.message ?? err}`);
     }
-    if (typeof r.basicInsurance !== 'string' || !r.basicInsurance) {
-      throw new AiParseError(`Missing basicInsurance for ${companyName}`);
-    }
-    if (!Array.isArray(r.otherBenefits) || r.otherBenefits.length > 3) {
-      throw new AiParseError(`Invalid otherBenefits for ${companyName}`);
-    }
-    if (!Array.isArray(r.pros) || r.pros.length > 4) {
-      throw new AiParseError(`Invalid pros for ${companyName}`);
-    }
-    if (!Array.isArray(r.cons) || r.cons.length > 4) {
-      throw new AiParseError(`Invalid cons for ${companyName}`);
-    }
-    if (!['low', 'medium', 'high'].includes(r.riskLevel)) {
-      throw new AiParseError(`Invalid riskLevel for ${companyName}`);
-    }
-    if (!Array.isArray(r.riskFactors) || r.riskFactors.length > 3) {
-      throw new AiParseError(`Invalid riskFactors for ${companyName}`);
-    }
-    if (typeof r.benefitForRisk !== 'string' || !r.benefitForRisk) {
-      throw new AiParseError(`Missing benefitForRisk for ${companyName}`);
-    }
-
-    return {
-      companySize: r.companySize,
-      basicInsurance: r.basicInsurance,
-      otherBenefits: r.otherBenefits,
-      pros: r.pros,
-      cons: r.cons,
-      riskLevel: r.riskLevel as 'low' | 'medium' | 'high',
-      riskFactors: r.riskFactors,
-      benefitForRisk: r.benefitForRisk,
-    };
   }
 }

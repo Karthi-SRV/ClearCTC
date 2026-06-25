@@ -16,10 +16,11 @@ import {
   IsOptional,
   ValidateIf,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import type { FamilyType } from '../../shared/schemas/city-expense.schema.js';
 
 export class OfferInputDto {
+  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)

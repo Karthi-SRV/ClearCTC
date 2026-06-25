@@ -63,6 +63,7 @@ describe('ClaudeAiClient.call', () => {
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
+      text: async () => '',
     }) as any;
 
     await expect(client.call('sys', 'user')).rejects.toThrow(AiParseError);

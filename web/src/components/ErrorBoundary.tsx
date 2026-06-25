@@ -1,12 +1,9 @@
-/**
- * ErrorBoundary — catches synchronous React render errors.
- *
- * Because React error boundaries must be class components, this one
- * uses a companion functional wrapper that reads the ErrorContext and
- * passes `pushError` in via a prop.
- */
 import { Component, type ReactNode } from 'react';
 import { useErrors } from '../context/ErrorContext';
+
+// Tracks errors already forwarded to ErrorContext so a global window.onerror
+// handler doesn't double-report the same instance.
+const reportedErrors = new WeakSet<Error>();
 
 interface Props {
   children: ReactNode;
@@ -33,9 +30,8 @@ class ErrorBoundaryInner extends Component<Props, State> {
   componentDidCatch(error: unknown) {
     const message =
       error instanceof Error ? error.message : 'An unexpected rendering error occurred';
-    // Tag the error so the global window.error handler does not double-report it
     if (error instanceof Error) {
-      (error as Error & { __reportedByErrorBoundary?: boolean }).__reportedByErrorBoundary = true;
+      reportedErrors.add(error);
     }
     this.props.pushError(message);
   }

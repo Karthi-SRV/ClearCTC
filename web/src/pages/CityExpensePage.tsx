@@ -18,6 +18,8 @@ interface ExpenseBreakdown {
   total: number;
 }
 
+type HouseholdSizeKey = 'individual' | 'family' | 'family3' | 'family4' | 'family5' | 'family6';
+
 interface CityExpenseRecord {
   city: string;
   generatedAt: string;
@@ -65,7 +67,7 @@ export default function CityExpensePage() {
   const [all, setAll]           = useState<CityExpenseRecord[]>([]);
   // selected uses lowercase city keys to match CitySelector's contract
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [householdSize, setHouseholdSize] = useState<string>('family4');
+  const [householdSize, setHouseholdSize] = useState<HouseholdSizeKey>('family4');
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState<string | null>(null);
   const [hasAppliedDefault, setHasAppliedDefault] = useState(false);
@@ -119,7 +121,7 @@ export default function CityExpensePage() {
 
   const activeRows = useMemo(() => {
     return rows.map((r) => {
-      const breakdown = (r as any)[householdSize] as ExpenseBreakdown || r.family4;
+      const breakdown: ExpenseBreakdown = r[householdSize] ?? r.family4;
       return {
         ...r,
         breakdown,
@@ -181,7 +183,7 @@ export default function CityExpensePage() {
             <select
               id="household-size-select"
               value={householdSize}
-              onChange={(e) => setHouseholdSize(e.target.value)}
+              onChange={(e) => setHouseholdSize(e.target.value as HouseholdSizeKey)}
               className="ce-select"
             >
               <option value="individual">Individual (1 person)</option>

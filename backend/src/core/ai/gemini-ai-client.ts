@@ -1,16 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { GEMINI_QUOTA_EXHAUSTED_PREFIX } from './ai-client.interface.js';
 import { AiParseError } from './ai-parse.error.js';
 import { AiResponseParser } from './ai-response-parser.js';
+import { MAX_RETRIES, retryDelay, sleep } from './ai-retry.util.js';
 
 const GEMINI_BASE_URL =
   'https://generativelanguage.googleapis.com/v1beta/models';
-
-// Free tier: 15 RPM. On transient rate-limit 429s, back off then retry.
-const MAX_RETRIES = 3;
-const RETRY_DELAYS_MS = [15_000, 30_000, 60_000];
-
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 // Detects a hard quota exhaustion (account/daily limit) vs a soft rate-limit hit.
 // Quota exhaustion: body mentions "billing" — no amount of retrying will help.
@@ -20,11 +16,9 @@ function isQuotaExhausted(body: string): boolean {
   return lower.includes('billing') || lower.includes('check your plan');
 }
 
-// Exported so seeders can bail out early without hammering an exhausted quota.
-export const GEMINI_QUOTA_EXHAUSTED_PREFIX = '[GEMINI_QUOTA_EXHAUSTED]';
-
 @Injectable()
 export class GeminiAiClient extends AiResponseParser {
+  private readonly logger = new Logger(GeminiAiClient.name);
   private readonly apiKey: string;
   private readonly model: string;
 
@@ -49,6 +43,7 @@ export class GeminiAiClient extends AiResponseParser {
       generationConfig: { response_mime_type: 'application/json' },
     });
 
+    const startTime = Date.now();
     let response: Response;
     let attempt = 0;
 
@@ -59,8 +54,8 @@ export class GeminiAiClient extends AiResponseParser {
           headers: { 'Content-Type': 'application/json' },
           body: reqBody,
         });
-      } catch (err: any) {
-        throw new AiParseError(`Gemini connection error: ${err?.message ?? err}`);
+      } catch (err: unknown) {
+        throw new AiParseError(`Gemini connection error: ${err instanceof Error ? err.message : String(err)}`);
       }
 
       if (response.status === 429) {
@@ -77,10 +72,8 @@ export class GeminiAiClient extends AiResponseParser {
 
         // Soft rate-limit — back off and retry.
         if (attempt < MAX_RETRIES) {
-          const retryAfterSec = parseInt(response.headers.get('Retry-After') ?? '0', 10);
-          const delayMs = retryAfterSec > 0 ? retryAfterSec * 1000 : RETRY_DELAYS_MS[attempt];
+          await sleep(retryDelay(attempt, response.headers.get('Retry-After')));
           attempt++;
-          await sleep(delayMs);
           continue;
         }
 
@@ -101,7 +94,28 @@ export class GeminiAiClient extends AiResponseParser {
       );
     }
 
-    const data = (await response!.json()) as any;
+    const data = (await response!.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[];
+      usageMetadata?: {
+        promptTokenCount?: number;
+        candidatesTokenCount?: number;
+        totalTokenCount?: number;
+      };
+    };
+
+    const durationMs = Date.now() - startTime;
+    const usage = data.usageMetadata;
+    const promptTokens = usage?.promptTokenCount ?? 0;
+    const outputTokens = usage?.candidatesTokenCount ?? 0;
+    const totalTokens = usage?.totalTokenCount ?? (promptTokens + outputTokens);
+    const costUsd = (promptTokens * 0.075) / 1_000_000 + (outputTokens * 0.3) / 1_000_000;
+
+    this.logger.log(
+      `Gemini call | Model: ${this.model} | Duration: ${durationMs}ms | ` +
+        `Tokens: ${promptTokens} in, ${outputTokens} out, ${totalTokens} total | ` +
+        `Cost: $${costUsd.toFixed(6)}`,
+    );
+
     const rawText: string =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 

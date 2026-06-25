@@ -10,11 +10,11 @@ const INR = new Intl.NumberFormat('en-IN', {
 });
 
 function lpa(n: number) {
-  return `${(Math.round(n / 10_000) / 10).toFixed(1)} LPA`;
+  return `${(Math.round(n / 1_00_000 * 10) / 10).toFixed(1)} LPA`;
 }
 
 function lakh(n: number) {
-  return `₹${(Math.round(n / 10_000) / 10).toFixed(1)}L`;
+  return `₹${(Math.round(n / 1_00_000 * 10) / 10).toFixed(1)}L`;
 }
 
 // ── Tooltip helper ────────────────────────────────────────────────────────────

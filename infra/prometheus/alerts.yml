@@ -1,0 +1,42 @@
+groups:
+  - name: comp-copilot
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(comp_copilot_http_requests_total{status=~"5.."}[2m]))
+          /
+          sum(rate(comp_copilot_http_requests_total[2m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error rate above 5% for 2 minutes"
+
+      - alert: HighP95Latency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(comp_copilot_http_duration_seconds_bucket[5m])) by (le)
+          ) > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "P95 response latency above 2 seconds"
+
+      - alert: GeminiQuotaExhausted
+        expr: |
+          count_over_time(
+            {app="comp-copilot"} |= "[GEMINI_QUOTA_EXHAUSTED]" [5m]
+          ) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "Gemini account quota exhausted — seed will not complete"
+
+      - alert: ProcessRestarted
+        expr: |
+          increase(process_start_time_seconds{job="comp-copilot-backend"}[5m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "comp-copilot backend process restarted"

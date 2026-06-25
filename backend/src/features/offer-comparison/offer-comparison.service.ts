@@ -18,6 +18,11 @@ import type {
   EmployeeRatingDto,
 } from './dtos/offer-comparison-response.dto.js';
 import { OffersService } from './offers.service.js';
+import { AiOfferComparisonSchema } from '../../shared/schemas/ai-validation.schemas.js';
+import {
+  OFFER_COMPARISON_SYSTEM_PROMPT,
+  buildOfferComparisonUserPrompt,
+} from '../../shared/prompts/prompt-registry.js';
 
 // ── AI response types ─────────────────────────────────────────────────────────
 // AI only returns score + scoreBreakdown per offer (qualitative fields are
@@ -62,11 +67,6 @@ interface AiResponse {
 const DATA_DISCLAIMER =
   'Tax: new regime FY2025-26 · Ratings: seeded data · Expenses: illustrative estimates · Decision support only';
 
-const SYSTEM_PROMPT =
-  'You are a senior compensation analyst helping an Indian software engineer make a job-switching decision. ' +
-  'You reason over structured data supplied to you. You never invent salary figures, ratings, company facts, or benefits not present in the supplied data. ' +
-  'Every claim must cite which data field drove it. Return only valid JSON. Start with { and end with }.';
-
 @Injectable()
 export class OfferComparisonService {
   private readonly logger = new Logger(OfferComparisonService.name);
@@ -89,57 +89,19 @@ export class OfferComparisonService {
   // ── AI response validation ───────────────────────────────────────────────────
 
   validateAiResponse(raw: object, inputNames: string[]): AiResponse {
-    const result = raw as AiResponse;
+    try {
+      const result = AiOfferComparisonSchema.parse(raw) as unknown as AiResponse;
 
-    if (!Array.isArray(result.offers)) {
-      throw new AiParseError('AI response missing offers array');
+      if (!inputNames.includes(result.recommendation?.bestOffer)) {
+        throw new Error(
+          `bestOffer "${result.recommendation?.bestOffer}" does not match any input`,
+        );
+      }
+
+      return result;
+    } catch (err: any) {
+      throw new AiParseError(`AI response validation failed: ${err.message ?? err}`);
     }
-
-    for (const o of result.offers) {
-      if (typeof o.score !== 'number' || o.score < 0 || o.score > 100) {
-        throw new AiParseError(`score out of range for ${o.companyName}`);
-      }
-
-      const { financial = 0, qualitative = 0, risk: riskScore = 0 } = o.scoreBreakdown ?? {};
-      const sum = financial + qualitative + riskScore;
-      if (Math.abs(sum - o.score) > 1) {
-        throw new AiParseError(`scoreBreakdown does not sum to score for ${o.companyName}`);
-      }
-
-      if (
-        financial < 0 || financial > 40 ||
-        qualitative < 0 || qualitative > 40 ||
-        riskScore < 0 || riskScore > 20
-      ) {
-        throw new AiParseError(`scoreBreakdown component out of bounds for ${o.companyName}`);
-      }
-
-      // Qualitative fields are optional (only present for unknown companies)
-      if (o.pros !== undefined && (!Array.isArray(o.pros) || o.pros.length > 4)) {
-        throw new AiParseError(`pros exceeds 4 items for ${o.companyName}`);
-      }
-      if (o.cons !== undefined && (!Array.isArray(o.cons) || o.cons.length > 4)) {
-        throw new AiParseError(`cons exceeds 4 items for ${o.companyName}`);
-      }
-      if (
-        o.riskAssessment !== undefined &&
-        !['low', 'medium', 'high'].includes(o.riskAssessment?.level)
-      ) {
-        throw new AiParseError(`invalid risk level for ${o.companyName}`);
-      }
-    }
-
-    if (!inputNames.includes(result.recommendation?.bestOffer)) {
-      throw new AiParseError(
-        `bestOffer "${result.recommendation?.bestOffer}" does not match any input`,
-      );
-    }
-
-    if (!['high', 'medium', 'low'].includes(result.recommendation?.confidence)) {
-      throw new AiParseError('invalid confidence value');
-    }
-
-    return result;
   }
 
   // ── Main execute ─────────────────────────────────────────────────────────────
@@ -235,7 +197,7 @@ export class OfferComparisonService {
       // score, scoreBreakdown, and recommendation.
       this.logger.log(`[execute] Calling AI for scoring and recommendation`);
       const userPrompt = this.buildPrompt(user.currentCity, user.currentCtcLpa, snapshots, companyRecords);
-      const rawAiResponse = await this.ai.call(SYSTEM_PROMPT, userPrompt);
+      const rawAiResponse = await this.ai.call(OFFER_COMPARISON_SYSTEM_PROMPT, userPrompt);
       const inputNames = dto.offers.map((o) => o.companyName);
       const aiResult = this.validateAiResponse(rawAiResponse, inputNames);
 
@@ -445,26 +407,13 @@ export class OfferComparisonService {
       : 'All company profiles are pre-supplied (profileType="stored"). ' +
         'Return only score and scoreBreakdown per offer, plus the shared recommendation block.';
 
-    return `Candidate currentCity: "${currentCity}", currentCtcLpa: ${currentCtcLpa} LPA.
-
-DETERMINISTIC SNAPSHOTS (do not modify these figures):
-${JSON.stringify(leanSnapshots)}
-
-COMPANY PROFILES:
-${JSON.stringify(companyContext)}
-
-TASK: ${taskInstruction}
-Return JSON matching this schema:
-${JSON.stringify(schemaResponse)}
-
-RULES:
-- Never introduce a salary figure not in the snapshot data.
-- Never invent a benefit, rating, or company fact not in the company profiles.
-- If a field is missing, output "Not available in data". Do not guess.
-- Bounds: score 0-100; breakdown: financial 0-40, qualitative 0-40, risk 0-20; sum must equal score exactly.
-- bestOffer must match submitted companyName exactly.
-- High-salary with poor ratings and high risk must not score above 75.
-- benefitForRisk must weigh monthlySavings delta against risk factors.
-- If offers are within 5 score points of each other, state this in caveat.`;
+    return buildOfferComparisonUserPrompt(
+      currentCity,
+      currentCtcLpa,
+      leanSnapshots,
+      companyContext,
+      taskInstruction,
+      schemaResponse,
+    );
   }
 }
