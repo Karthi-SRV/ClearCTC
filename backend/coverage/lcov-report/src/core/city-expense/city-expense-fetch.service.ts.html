@@ -152,67 +152,27 @@
 <a name='L87'></a><a href='#L87'>87</a>
 <a name='L88'></a><a href='#L88'>88</a>
 <a name='L89'></a><a href='#L89'>89</a>
-<a name='L90'></a><a href='#L90'>90</a>
-<a name='L91'></a><a href='#L91'>91</a>
-<a name='L92'></a><a href='#L92'>92</a>
-<a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a>
-<a name='L95'></a><a href='#L95'>95</a>
-<a name='L96'></a><a href='#L96'>96</a>
-<a name='L97'></a><a href='#L97'>97</a>
-<a name='L98'></a><a href='#L98'>98</a>
-<a name='L99'></a><a href='#L99'>99</a>
-<a name='L100'></a><a href='#L100'>100</a>
-<a name='L101'></a><a href='#L101'>101</a>
-<a name='L102'></a><a href='#L102'>102</a>
-<a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a>
-<a name='L108'></a><a href='#L108'>108</a>
-<a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<a name='L90'></a><a href='#L90'>90</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -282,48 +242,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Inject, Injectable } from '@nestjs/common';
-import { CITY_EXPENSE_AI_CLIENT, COMPANY_AI_CLIENT } from '../ai/ai-client.interface.js';
+import { CITY_EXPENSE_AI_CLIENT } from '../ai/ai-client.interface.js';
 import type { AiClient } from '../ai/ai-client.interface.js';
 import { AiParseError } from '../ai/ai-parse.error.js';
 import type { CityExpense, ExpenseBreakdown } from '../../shared/schemas/city-expense.schema.js';
+import {
+  CITY_EXPENSE_SYSTEM_PROMPT,
+  buildCityExpenseUserPrompt,
+} from '../../shared/prompts/prompt-registry.js';
 &nbsp;
 const BREAKDOWN_FIELDS: Array&lt;keyof ExpenseBreakdown&gt; = [
   'rent', 'groceries', 'utilities', 'transport', 'foodDining',
   'personalLifestyle', 'miscellaneous',
 ];
 &nbsp;
-const SYSTEM = `You are a cost-of-living research assistant for Indian cities. Return ONLY valid JSON — no markdown, no extra text.
-The JSON must have exactly these keys: individual, family, family3, family4, family5, family6.
-Each key's value must be an expense breakdown object with these integer fields (positive INR per month):
-rent, groceries, utilities, transport, foodDining, personalLifestyle, miscellaneous, total.
-For each breakdown, the total field MUST equal the exact arithmetic sum of all other fields.
-Include a top-level non-empty disclaimer string.`;
-&nbsp;
 @Injectable()
 export class CityExpenseFetchService {
   constructor(@Inject(CITY_EXPENSE_AI_CLIENT) private readonly ai: AiClient) {}
 &nbsp;
   async fetchExpense(city: string): Promise&lt;CityExpense&gt; {
-    const userPrompt = `Provide a realistic, data-driven monthly expense estimate in INR for a middle-class lifestyle specifically in ${city}, India. 
+    const userPrompt = buildCityExpenseUserPrompt(city);
 &nbsp;
-Because the cost of living varies heavily across Indian metros, do NOT use generic or static averages. Use your real-world knowledge of ${city}'s localized real estate market, typical middle-class neighborhoods, and local consumer pricing to generate these numbers.
-&nbsp;
-Strictly adhere to these parameters:
-1. Dynamic Real Estate: Estimate the "rent" field based entirely on current middle-class standards in ${city}. Specifically, assume the following accommodation sizes:
-   - individual (1 member): 1BHK or shared accommodation
-   - family (2 members): 1BHK
-   - family3 (3 members): 1-2BHK
-   - family4 (4 members): 1-2BHK
-   - family5 (5 members): 2-3BHK
-   - family6 (6 members): 2-3BHK
-   Ensure the rent reflects these standards in standard residential areas of ${city}.
-2. Natural Scaling: Ensure that all non-rent fields (groceries, utilities, transport, foodDining, personalLifestyle, miscellaneous) reflect the actual local costs of ${city} and scale up incrementally and logically with each added family member.
-3. Strict Integers: Every single expense field must be a realistic, non-zero positive integer.
-4. ABSOLUTE MATHEMATICAL CONSTRAINT: For every family size block, the "total" field MUST exactly equal the arithmetic sum of the other fields: rent + groceries + utilities + transport + foodDining + personalLifestyle + miscellaneous. Double-check the math before outputting.
-&nbsp;
-Return ONLY the JSON structure matching the system template. Do not include markdown formatting or conversational text.`;
-&nbsp;
-    const raw = await this.ai.call(SYSTEM, userPrompt) as Record&lt;string, any&gt;;
+    const raw = await this.ai.call(CITY_EXPENSE_SYSTEM_PROMPT, userPrompt) as Record&lt;string, any&gt;;
 &nbsp;
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!raw || typeof raw !== 'object') {
 <span class="cstat-no" title="statement not covered" >      throw new AiParseError(`Invalid AI response format: expected object, got ${typeof raw}`);</span>
@@ -397,7 +337,7 @@ Return ONLY the JSON structure matching the system template. Do not include mark
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-25T09:12:27.267Z
+                at 2026-06-25T13:41:34.806Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>10/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -119,27 +119,24 @@
 <a name='L54'></a><a href='#L54'>54</a>
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L57'></a><a href='#L57'>57</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -153,35 +150,38 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Controller, Get, Query } from '@nestjs/common';</span>
-<span class="cstat-no" title="statement not covered" >import { CityExpenseService } from '../../core/city-expense/city-expense.service.js';</span>
-<span class="cstat-no" title="statement not covered" >import { Public } from '../../shared/decorators/public.decorator.js';</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Controller, Get, Query } from '@nestjs/common';
+import { CityExpenseService } from '../../core/city-expense/city-expense.service.js';
+import { Public } from '../../shared/decorators/public.decorator.js';
 &nbsp;
 @Controller('api/v1')
-export <span class="cstat-no" title="statement not covered" >class <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >CityExpenseController </span>{</span></span>
-<span class="fstat-no" title="function not covered" >  constructor(private readonly <span class="cstat-no" title="statement not covered" >s</span>ervice: C</span>ityExpenseService) {}
+export class CityExpenseController {
+  constructor(private readonly service: CityExpenseService<span class="branch-1 cbranch-no" title="branch not covered" >) {}</span>
 &nbsp;
   /**
    * GET /api/v1/cities
@@ -190,9 +190,9 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
    */
   @Public()
   @Get('cities')
-  async <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getCities(</span>): Promise&lt;{ cities: string[] }&gt; {</span>
-    const cities = <span class="cstat-no" title="statement not covered" >await this.service.getCityNames();</span>
-<span class="cstat-no" title="statement not covered" >    return { cities };</span>
+  async getCities(): Promise<span class="branch-1 cbranch-no" title="branch not covered" >&lt;{ cities: string[] }&gt; {</span>
+    const cities = await this.service.getCityNames();
+    return { cities };
   }
 &nbsp;
   /**
@@ -209,16 +209,16 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
    *   → multiple cities (comma-separated)
    */
   @Get('city-expenses')
-  async <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getAll(</span>@Query('city') cityParam?: string | string[]) {</span>
-    const rawList = <span class="cstat-no" title="statement not covered" >cityParam</span>
+  async getAll(@Query('city') cityParam?: string | string[]) {
+    const rawList = cityParam
       ? (Array.isArray(cityParam) ? cityParam : [cityParam])
       : [];
 &nbsp;
-    const cities = <span class="cstat-no" title="statement not covered" >rawList.flatMap(<span class="fstat-no" title="function not covered" >(c</span>) =&gt; <span class="cstat-no" title="statement not covered" >c.split(','))</span>;</span>
+    const cities = rawList.flatMap((c) =&gt; c.split(','));
 &nbsp;
-    const docs = <span class="cstat-no" title="statement not covered" >await this.service.getExpensesByFilter(cities);</span>
+    const docs = await this.service.getExpensesByFilter(cities);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return docs.map(<span class="fstat-no" title="function not covered" >(d</span>) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+    return docs.map((d) =&gt; ({
       city: d.city,
       generatedAt: d.generatedAt,
       disclaimer: d.disclaimer,
@@ -238,7 +238,7 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-25T09:12:27.267Z
+                at 2026-06-25T13:41:34.806Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">70% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>7/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -90,58 +90,58 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Body, Controller, Post, UseGuards } from '@nestjs/common';</span>
-<span class="cstat-no" title="statement not covered" >import { Logger } from '@nestjs/common';</span>
-<span class="cstat-no" title="statement not covered" >import { Throttle } from '@nestjs/throttler';</span>
-<span class="cstat-no" title="statement not covered" >import { CreateOfferComparisonDto } from '../../shared/dtos/offer-input.dto.js';</span>
-<span class="cstat-no" title="statement not covered" >import { OfferComparisonService } from './offer-comparison.service.js';</span>
-<span class="cstat-no" title="statement not covered" >import { CurrentUser } from '../../shared/decorators/current-user.decorator.js';</span>
-<span class="cstat-no" title="statement not covered" >import { AiThrottlerGuard } from '../../shared/guards/ai-throttler.guard.js';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import { CreateOfferComparisonDto } from '../../shared/dtos/offer-input.dto.js';
+import { OfferComparisonService } from './offer-comparison.service.js';
+import { CurrentUser } from '../../shared/decorators/current-user.decorator.js';
+import { AiThrottlerGuard } from '../../shared/guards/ai-throttler.guard.js';
 import type { AuthPayload } from '../auth/auth.service.js';
 &nbsp;
 @Controller('api/v1/offer-comparisons')
-export class <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >OfferComparisonController<span class="cstat-no" title="statement not covered" > </span>{</span></span>
-  private readonly logger = <span class="cstat-no" title="statement not covered" >new Logger(OfferComparisonController.name);</span>
+export class OfferComparisonController {
+  private readonly logger = new Logger(OfferComparisonController.name);
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(private readonly <span class="cstat-no" title="statement not covered" >o</span>fferComparison: O</span>fferComparisonService) {}
+  constructor(private readonly offerComparison: OfferComparisonService<span class="branch-1 cbranch-no" title="branch not covered" >) {}</span>
 &nbsp;
   // 3 AI comparison requests per user per hour.
   @Post()
   @UseGuards(AiThrottlerGuard)
   @Throttle({ ai: { limit: 3, ttl: 60_000 } })
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  createOfferComparison(</span></span>
+  createOfferComparison(
     @CurrentUser() user: AuthPayload,
-    @Body() dto: CreateOfferComparisonDto,
+    @Body() dto: CreateOfferComparisonDto<span class="branch-1 cbranch-no" title="branch not covered" >,</span>
   ) {
-<span class="cstat-no" title="statement not covered" >    this.logger.log(`POST /api/v1/offer-comparisons | userId: ${user.sub} | offerCount: ${dto.offers?.length || 0}`);</span>
-<span class="cstat-no" title="statement not covered" >    return this.offerComparison.execute(user.sub, dto);</span>
+    this.logger.log(`POST /api/v1/offer-comparisons | userId: ${user.sub} | offerCount: ${dto.offers?.length || <span class="branch-1 cbranch-no" title="branch not covered" >0}</span>`);
+    return this.offerComparison.execute(user.sub, dto);
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -151,7 +151,7 @@ export class <span class="cstat-no" title="statement not covered" ><span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-25T09:12:27.267Z
+                at 2026-06-25T13:41:34.806Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

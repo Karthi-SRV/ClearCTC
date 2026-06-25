@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">63.63% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/11</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.5% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -89,10 +89,10 @@
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -101,18 +101,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@nestjs/common';
@@ -128,17 +128,17 @@ export interface CreateOfferDto {
 &nbsp;
 @Injectable()
 export class OffersService {
-<span class="fstat-no" title="function not covered" >  constructor(</span>
+  constructor(
     @InjectModel(Offer.name)
-    private readonly <span class="cstat-no" title="statement not covered" >offerModel: M</span>odel<span class="branch-1 cbranch-no" title="branch not covered" >&lt;OfferDocument&gt;,</span>
+    private readonly offerModel: Model<span class="branch-1 cbranch-no" title="branch not covered" >&lt;OfferDocument&gt;,</span>
   ) {}
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async </span>createMany(offers: CreateOfferDto[]): Promise&lt;OfferDocument[]&gt; {
-    const docs = <span class="cstat-no" title="statement not covered" >offers.map(<span class="fstat-no" title="function not covered" >(o</span>) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+  async createMany(offers: CreateOfferDto[]): Promise&lt;OfferDocument[]&gt; {
+    const docs = offers.map((o) =&gt; ({
       ...o,
       userId: new Types.ObjectId(o.userId),
     }));
-<span class="cstat-no" title="statement not covered" >    return this.offerModel.insertMany(docs) as unknown as Promise&lt;OfferDocument[]&gt;;</span>
+    return this.offerModel.insertMany(docs) as unknown as Promise&lt;OfferDocument[]&gt;;
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -148,7 +148,7 @@ export class OffersService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-25T09:12:27.267Z
+                at 2026-06-25T13:41:34.806Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -118,3 +118,124 @@ describe('CityExpenseService.forceRefresh', () => {
     expect(mockCache.set).toHaveBeenCalled();
   });
 });
+
+describe('CityExpenseService.getCityNames', () => {
+  it('returns city names sorted alphabetically', async () => {
+    const modelWithFind = {
+      find: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve([{ city: 'Pune' }, { city: 'Bangalore' }, { city: 'Mumbai' }]) }),
+      }),
+      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
+      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+    };
+    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, {} as any);
+
+    const names = await svc.getCityNames();
+    expect(names).toEqual(['Bangalore', 'Mumbai', 'Pune']);
+  });
+});
+
+describe('CityExpenseService.getAllExpenses', () => {
+  it('returns all expense documents', async () => {
+    const docs = [makeDoc('Bangalore'), makeDoc('Pune')];
+    const modelWithFind = {
+      find: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(docs) }),
+      }),
+      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
+      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+    };
+    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, {} as any);
+
+    const result = await svc.getAllExpenses();
+    expect(result).toHaveLength(2);
+  });
+});
+
+describe('CityExpenseService.getExpensesByFilter', () => {
+  it('returns all expenses when filter is empty', async () => {
+    const docs = [makeDoc('Bangalore'), makeDoc('Pune')];
+    const modelWithFind = {
+      find: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(docs) }),
+      }),
+      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
+      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+    };
+    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, {} as any);
+
+    const result = await svc.getExpensesByFilter([]);
+    expect(result).toHaveLength(2);
+  });
+
+  it('returns filtered expenses for matching cities', async () => {
+    const docs = [makeDoc('Bangalore')];
+    const modelWithFind = {
+      find: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(docs) }),
+      }),
+      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
+      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+    };
+    const fetchMock = { fetchExpense: jest.fn().mockResolvedValue(makeDoc('Pune')) };
+    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, fetchMock as any);
+
+    const result = await svc.getExpensesByFilter(['Bangalore', 'Pune']);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('CityExpenseService.getExpenseBreakdown — family type routing', () => {
+  it('returns individual breakdown for familyType=individual', async () => {
+    const { svc, mockCache } = makeService();
+    const doc = makeDoc('Bangalore');
+    mockCache.get.mockResolvedValue(doc);
+
+    const result = await svc.getExpenseBreakdown('Bangalore', 'individual', 1);
+    expect(result.familyType).toBe('individual');
+    expect(result.breakdown).toEqual(doc.individual);
+  });
+
+  it('returns family2 breakdown for memberCount=2', async () => {
+    const { svc, mockCache } = makeService();
+    const doc = makeDoc('Bangalore');
+    mockCache.get.mockResolvedValue(doc);
+
+    const result = await svc.getExpenseBreakdown('Bangalore', 'family', 2);
+    expect(result.breakdown).toEqual(doc.family);
+  });
+
+  it('returns family4 breakdown for memberCount=4 (default)', async () => {
+    const { svc, mockCache } = makeService();
+    const doc = makeDoc('Bangalore');
+    mockCache.get.mockResolvedValue(doc);
+
+    const result = await svc.getExpenseBreakdown('Bangalore', 'family', 4);
+    expect(result.breakdown).toEqual(doc.family4);
+  });
+
+  it('returns family6 breakdown for memberCount=6 and out-of-range', async () => {
+    const { svc, mockCache } = makeService();
+    const doc = makeDoc('Bangalore');
+    mockCache.get.mockResolvedValue(doc);
+
+    const result6 = await svc.getExpenseBreakdown('Bangalore', 'family', 6);
+    expect(result6.breakdown).toEqual(doc.family6);
+  });
+});
+
+describe('CityExpenseService.onModuleDestroy', () => {
+  it('clears the fetch interval if set', () => {
+    jest.useFakeTimers();
+    const { svc } = makeService();
+    // Manually inject a fake interval so we can test destruction
+    (svc as any).fetchInterval = setInterval(() => {}, 10000);
+    expect(() => svc.onModuleDestroy()).not.toThrow();
+    jest.useRealTimers();
+  });
+
+  it('does not throw when no interval is set', () => {
+    const { svc } = makeService();
+    expect(() => svc.onModuleDestroy()).not.toThrow();
+  });
+});

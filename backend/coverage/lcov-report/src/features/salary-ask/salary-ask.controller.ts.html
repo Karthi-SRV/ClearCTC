@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>9/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -86,50 +86,50 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Body, Controller, Get, Post } from '@nestjs/common';</span>
-<span class="cstat-no" title="statement not covered" >import { SalaryAskRequestDto } from './dtos/salary-ask-request.dto.js';</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Body, Controller, Get, Post } from '@nestjs/common';
+import { SalaryAskRequestDto } from './dtos/salary-ask-request.dto.js';
 import { SalaryAskResponseDto } from './dtos/salary-ask-response.dto.js';
-<span class="cstat-no" title="statement not covered" >import { SalaryAskService } from './salary-ask.service.js';</span>
-<span class="cstat-no" title="statement not covered" >import { Public } from '../../shared/decorators/public.decorator.js';</span>
+import { SalaryAskService } from './salary-ask.service.js';
+import { Public } from '../../shared/decorators/public.decorator.js';
 &nbsp;
 @Controller('api/v1/salary-asks')
-export <span class="cstat-no" title="statement not covered" >class <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >SalaryAskController </span>{</span></span>
-<span class="fstat-no" title="function not covered" >  constructor(private readonly <span class="cstat-no" title="statement not covered" >s</span>alaryAsk: S</span>alaryAskService) {}
+export class SalaryAskController {
+  constructor(private readonly salaryAsk: SalaryAskService<span class="branch-1 cbranch-no" title="branch not covered" >) {}</span>
 &nbsp;
   @Public()
   @Get('cities')
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  getCities(</span>): { cities: string[] } {</span>
-<span class="cstat-no" title="statement not covered" >    return { cities: this.salaryAsk.getSupportedCities() };</span>
+  getCities(): { cities: string[] } {
+    return { cities: this.salaryAsk.getSupportedCities() };
   }
 &nbsp;
   @Post()
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  createSalaryAsk(</span></span>
-    @Body() dto: SalaryAskRequestDto,
-  ): Promise&lt;SalaryAskResponseDto&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.salaryAsk.execute(dto);</span>
+  createSalaryAsk(
+    @Body() dto: SalaryAskRequestDto<span class="branch-1 cbranch-no" title="branch not covered" >,</span>
+  ): Promise<span class="branch-1 cbranch-no" title="branch not covered" >&lt;SalaryAskResponseDto&gt; {</span>
+    return this.salaryAsk.execute(dto);
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -139,7 +139,7 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-25T09:12:27.267Z
+                at 2026-06-25T13:41:34.806Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

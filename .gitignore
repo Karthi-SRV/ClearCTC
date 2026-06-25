@@ -24,3 +24,5 @@ Thumbs.db
 .docker/
 .dev/
 scripts/
+
+backend/coverage/
