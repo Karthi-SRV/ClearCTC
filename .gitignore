@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment — never commit real secrets
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Logs (local dev only; Loki is the durable store)
+logs/
+*.log
+
+# OS / editor artefacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Docker runtime state
+.docker/
+.dev/
+scripts/
