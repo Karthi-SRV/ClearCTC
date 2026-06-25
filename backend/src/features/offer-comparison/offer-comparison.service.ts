@@ -145,7 +145,7 @@ export class OfferComparisonService {
           };
 
           this.logger.debug(`[execute] Data fetched | ${raw.companyName} | colIndex: ${colIndex} | totalExpense: ${expenseDoc.breakdown.total}`);
-          return { raw, expenseBreakdown, colIndexUsed: colIndex ?? 100 };
+          return { raw, expenseBreakdown, colIndexUsed: colIndex ?? 1.0 };
         }),
       );
 

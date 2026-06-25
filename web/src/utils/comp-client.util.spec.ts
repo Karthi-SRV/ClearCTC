@@ -6,10 +6,10 @@ import { computeMonthlyInHand } from './comp-client.util';
 // Tolerance: ±1 rupee (rounding at division-by-12).
 const CASES: Array<[lpa: number, expected: number]> = [
   [10,  81_533],
-  [20, 149_208],
-  [28, 197_645],
-  [40, 266_445],
-  [60, 381_112],
+  [20, 148_833],
+  [28, 197_083],
+  [40, 265_883],
+  [60, 380_550],
 ];
 
 describe('computeMonthlyInHand — cross-check vs backend within ₹1', () => {

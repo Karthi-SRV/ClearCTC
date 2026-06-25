@@ -239,8 +239,8 @@ describe('CompensationService', () => {
       benchmarkCTC: 1_500_000,
       experienceYears: 5,
       benchmarkExperienceMidpoint: 5,
-      colIndexCurrent: 100,
-      colIndexTarget: 100,
+      colIndexCurrent: 1.00,
+      colIndexTarget: 1.00,
     };
 
     it.each([
@@ -269,8 +269,8 @@ describe('CompensationService', () => {
       const sameCity = svc.computeSalaryRange({ ...base });
       const diffCity = svc.computeSalaryRange({
         ...base,
-        colIndexCurrent: 100,
-        colIndexTarget: 115,
+        colIndexCurrent: 1.00,
+        colIndexTarget: 1.15,
       });
       expect(diffCity.target).not.toBe(sameCity.target);
     });

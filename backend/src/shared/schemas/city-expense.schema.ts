@@ -17,6 +17,8 @@ export class ExpenseBreakdown {
 @Schema({ timestamps: false, collection: 'city-expenses' })
 export class CityExpense {
   @Prop({ required: true, unique: true, index: true }) city: string;
+  @Prop({ required: false }) colIndex?: number;
+  @Prop({ required: false }) isBase?: boolean;
   @Prop({ type: Object, required: false }) individual?: ExpenseBreakdown;
   @Prop({ type: Object, required: false }) family?: ExpenseBreakdown; // 2 members
   @Prop({ type: Object, required: false }) family3?: ExpenseBreakdown; // 3 members

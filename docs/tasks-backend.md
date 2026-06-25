@@ -52,7 +52,7 @@ Ordered build checklist for the NestJS backend. Work top-to-bottom. Each task ha
 - [x] **2.1** Define `DataSource` interface + `DATA_SOURCE` token + supporting types (`BenchmarkResult`, `CompanyRecord`, `RatingSet`, `ReviewSnippet`, `AiProfile`) in `data-source.interface.ts`.
 - [x] **2.2** Define `Company` Mongoose schema with sub-schemas: `RoleBenchmark`, `RatingSet`, `ReviewSnippet`, `AiProfile`.
 - [x] **2.3** Implement `LiveDataSource` — all methods throw "not enabled for demo". Unit test: each method throws.
-- [x] **2.4** Implement `CachedDataSource.getCOLIndex(city)` — static in-memory map, 70+ cities, Bangalore = 100; WFH/remote → null. Unit tests: Bangalore → 100, Mumbai → 115, unknown → null, WFH → null.
+- [x] **2.4** Implement `CachedDataSource.getCOLIndex(city)` — dynamic MongoDB lookup relative to Chennai = 1.00 base; WFH/remote → null. Unit tests: Chennai → 1.00, Mumbai → 1.31, unknown → null, WFH → null.
 - [x] **2.5** Implement `CachedDataSource.getCompany(name)` — case-insensitive regex on `name` or `aliases[]`. Unit tests: exact name match, alias match, unknown → null.
 - [x] **2.6** Implement `CachedDataSource.getBenchmark(company, role, experienceYears)` — role regex match + experience band containment. Unit tests: in-band → correct avgCTC; below all bands → null; above all bands → null; company not found → null.
 - [x] **2.7** Implement `CachedDataSource.getCompanyNames()` — sorted list from DB.

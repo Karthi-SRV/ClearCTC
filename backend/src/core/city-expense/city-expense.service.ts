@@ -218,17 +218,42 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
     city: string,
   ): Promise<CityExpense> {
     const result = await this.fetch.fetchExpense(city);
-    await this.model
+
+    let colIndex = 0;
+
+    const baseCity = await this.model
+        .findOne({ isBase: true })
+        .lean()
+        .exec();
+    if (city.trim().toLowerCase() === baseCity?.city.toLowerCase()) {
+      colIndex = 1.0;
+    } else {
+      if (baseCity && baseCity.family4 && baseCity.family4.total && result.family4?.total) {
+        colIndex = Math.round((result.family4.total / baseCity.family4.total) * 100) / 100;
+      } else {
+        colIndex = 0;
+      }
+    }
+
+    const updateData = {
+      ...result,
+      city,
+      colIndex,
+    };
+
+    const doc = await this.model
       .findOneAndUpdate(
         {
           city: new RegExp(`^${escapeRegex(city)}$`, 'i'),
         },
-        { $set: { ...result, city } },
+        { $set: updateData },
         { upsert: true, new: true },
       )
       .exec();
-    await this.cache.set(city, result);
-    return result;
+
+    const plain = doc.toObject ? doc.toObject() : doc;
+    await this.cache.set(city, plain as CityExpense);
+    return plain as CityExpense;
   }
 
   private resolveVirtualBreakdown(

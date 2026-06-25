@@ -87,7 +87,7 @@ function makeService(overrides: Partial<{
   };
 
   const data = overrides.data ?? {
-    getCOLIndex: jest.fn().mockResolvedValue(100),
+    getCOLIndex: jest.fn().mockResolvedValue(1.19),
     getCompany: jest.fn().mockResolvedValue(MOCK_COMPANY),
     getBenchmark: jest.fn().mockResolvedValue(null),
   };

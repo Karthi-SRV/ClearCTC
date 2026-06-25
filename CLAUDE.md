@@ -3,6 +3,10 @@
 Persistent project context for Claude Code. Read this before every task.
 Full spec lives in `/docs` — `requirements.md`, `design.md`, `scope.md`, `tasks.md`, `architecture.md`. When in doubt, STOP and ask rather than guess.
 
+- Security policy (trust boundary, JWT lifecycle, secret management, rate limiting): `docs/SECURITY.md`
+- Claude Code skills & MCP servers (what skills exist, how to install, token savings): `docs/mcp.md`
+- Skills source files (canonical, versioned with repo): `skills/<skill-name>/SKILL.md`
+
 ---
 
 ## What this is
@@ -110,6 +114,25 @@ Full rationale in `/docs/scope.md`.
 - Comments explain why, not what. No multi-line comment blocks.
 - No error handling for scenarios that can't happen. Trust internal code and framework guarantees.
 - TypeScript strict mode. No `any` except where Mongoose requires it.
+
+---
+
+## Claude Code Skills
+
+Skills are Markdown knowledge modules in `skills/`. Load one with its trigger command instead of re-explaining context.
+
+| Trigger | When to use |
+|---------|-------------|
+| `/indian-payroll-math` | Reviewing, testing, or extending `CompensationService`; verifying snapshot values |
+| `/graphify` | Map the codebase as a knowledge graph; query trust-boundary enforcement across files |
+| `/comp-copilot-devstack` | Starting the local stack, running tests, seeding data |
+| `/comp-copilot-debug-ai` | Debugging 502s, quota exhaustion, provider switching |
+| `/comp-copilot-new-city` | Adding a new Indian city to the expense system |
+| `/ai-provider-strategy` | Adding a new AI provider or a new AI call site |
+| `/nestjs-three-layer-cache` | Adding a new cached data type or debugging stale-data issues |
+| `/structured-ai-output` | Writing a new AI prompt or adding a validation rule |
+
+Skills must be installed in `~/.claude/skills/` to be active. See `docs/mcp.md` for install instructions.
 
 ---
 

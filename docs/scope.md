@@ -20,7 +20,7 @@ Every cut below is a deliberate decision, not an oversight. If any needs to be r
 | **Gemini free tier resilience** | Hard quota exhaustion (429 + billing keywords): throw `[GEMINI_QUOTA_EXHAUSTED]` prefix, abort seed loop immediately. Soft rate-limit (429, other): retry with 15 s → 30 s → 60 s backoff (max 3). |
 | **Mongo persistence** | Three collections: `users`, `companies`, `city-expenses`, `offers`. |
 | **Redis caching** | City expense docs with 7-day TTL. Cache key: `city-expense:{city_lowercase}`. Full doc cached (all 6 family breakdowns). |
-| **COL index** | Static in-memory lookup. 70+ Indian cities. Bangalore = 100. |
+| **COL index** | MongoDB-backed lookup (`city-expenses` collection). Derived dynamically relative to Chennai = 1.00 base. |
 | **Confidence + staleness signals** | Confidence (high/medium/low) driven by COL index resolution and expense data freshness in Phase 1; by company data age (90-day threshold) in Phase 2. AI echoes the supplied confidence level — it never re-derives it. |
 | **`LiveDataSource` adapter stub** | Interface implemented; every method throws. The seam exists so live scraping can be dropped in without touching any other module. |
 | **Observability** | Prometheus metrics (`prom-client`), Winston logger, optional Loki transport, Grafana dashboard. |
