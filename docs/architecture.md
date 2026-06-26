@@ -142,10 +142,10 @@ All clients extend `AiResponseParser`, which strips code fences before JSON pars
 
 Binds `DATA_SOURCE` token to `CachedDataSource`.
 
-**`CachedDataSource`** reads the `companies` MongoDB collection for:
+**`CachedDataSource`** reads the `companies` and `city-expenses` MongoDB collections for:
 - `getCompany(name)` — fuzzy case-insensitive match on name or aliases
 - `getBenchmark(company, role, experienceYears)` — role title match + experience range lookup
-- `getCOLIndex(city)` — in-memory lookup table, 70+ Indian cities, Bangalore = 100
+- `getCOLIndex(city)` — queries MongoDB `city-expenses` collection (schema field `colIndex`) for the city's cost-of-living index, calculated relative to Chennai = 1.00 base.
 - `getCompanyNames()` — sorted list for frontend dropdown
 
 **`LiveDataSource`** is a stub that throws "not enabled for demo" on every method. It exists as the adapter slot for future live scraping; consumers never import it directly.

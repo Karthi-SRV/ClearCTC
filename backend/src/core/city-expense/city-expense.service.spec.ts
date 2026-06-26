@@ -28,7 +28,15 @@ function makeService() {
   const lean = jest.fn();
   const exec = jest.fn().mockResolvedValue(null);
   const findOne = jest.fn().mockReturnValue({ lean: () => ({ exec }) });
-  const findOneAndUpdate = jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) });
+  const findOneAndUpdate = jest.fn().mockImplementation((filter, update) => {
+    const setObj = update?.$set || {};
+    return {
+      exec: () => Promise.resolve({
+        toObject: () => setObj,
+        ...setObj
+      })
+    };
+  });
   const mockModel = { findOne, findOneAndUpdate };
 
   const mockCache = {

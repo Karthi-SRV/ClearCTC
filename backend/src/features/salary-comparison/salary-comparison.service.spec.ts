@@ -31,7 +31,7 @@ const baseExpenseBreakdown = {
 
 function makeService({
   user = baseUser as ReturnType<typeof Object.assign> | null,
-  colIndex = 100,
+  colIndex = 1.19,
   company = null as object | null,
 }: {
   user?: object | null;

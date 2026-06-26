@@ -56,7 +56,7 @@ export class SalaryComparisonService {
           ]);
 
           this.logger.debug(`[execute] Data fetched | ${raw.companyName} | colIndex: ${colIndex} | totalExpense: ${expenseDoc.breakdown.total}`);
-          return { raw, expenseBreakdown: expenseDoc.breakdown, colIndexUsed: colIndex ?? 100 };
+          return { raw, expenseBreakdown: expenseDoc.breakdown, colIndexUsed: colIndex ?? 1.0 };
         }),
       );
 

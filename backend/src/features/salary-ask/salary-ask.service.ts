@@ -29,7 +29,7 @@ const STANDARD_CITIES = [
 
 const FRESH_THRESHOLD_MS = 30 * 24 * 3600 * 1000;
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
-const CHENNAI_COL_FALLBACK = 87;
+const CHENNAI_COL_FALLBACK = 1.0;
 
 // Fallback monthly totals (INR) represent a family-of-4 baseline.
 // Used when CityExpenseService is unavailable.

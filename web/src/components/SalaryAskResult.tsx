@@ -113,7 +113,7 @@ export default function SalaryAskResult({ result, expenses }: Props) {
 
   const baseCtcLpa = mode === 'current' ? result.currentCtcLpa : result.hikedCtcLpa;
   const baseCityRow = result.cityComparisons.find((c) => c.badge === 'your-base') ?? result.cityComparisons[0];
-  const baseColIdx = baseCityRow?.colIndex ?? 87;
+  const baseColIdx = baseCityRow?.colIndex ?? 1.0;
 
   const allCityRows = useMemo(
     () => result.cityComparisons.map((c) => recomputeRow(c, baseCtcLpa, baseColIdx, householdSize, expenses)),
@@ -342,7 +342,7 @@ export default function SalaryAskResult({ result, expenses }: Props) {
         <div className="p1r-notes-method">
           <p>Tax: FY 2025-26 new-regime — std deduction ₹75k; employee PF 12% of basic (cap ₹15k/mo); 4% cess; 87A rebate zeroes tax ≤ ₹12 L taxable.</p>
           <p>In-hand = CTC − annual PF − annual tax ÷ 12. Monthly expenses are AI-estimated city averages; individual spend varies.</p>
-          <p>COL base: Bangalore = 100. Equiv CTC = your CTC × (target city COL ÷ your COL). ±5% range = negotiation band.</p>
+          <p>COL base: Chennai = 1.00. Equiv CTC = your CTC × (target city COL ÷ your COL). ±5% range = negotiation band.</p>
           {result.expensesDisclaimer && (
             <p className="p1r-notes-disclaimer">✱ {result.expensesDisclaimer}</p>
           )}

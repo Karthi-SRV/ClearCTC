@@ -2,19 +2,27 @@ import { SalaryAskService } from './salary-ask.service.js';
 import { SalaryAskRequestDto } from './dtos/salary-ask-request.dto.js';
 
 const CITY_COL: Record<string, number> = {
-  kolkata: 75, chennai: 87, hyderabad: 90, pune: 88, bangalore: 100, mumbai: 115,
+  kolkata: 0.71, chennai: 1.00, hyderabad: 0.92, pune: 1.07, bangalore: 1.25, mumbai: 1.31,
 };
 
 // Returns the virtual breakdown object that CityExpenseService.getExpenseBreakdown resolves to
 // (not the raw CityExpense document — the service wraps the doc before returning).
 function makeExpenseDoc(city: string) {
+  const col = CITY_COL[city.toLowerCase()] ?? 1.00;
+  const total = Math.round(58_000 * col);
   return {
     city,
     familyType: 'family' as const,
     memberCount: 4,
     breakdown: {
-      rent: 30_000, groceries: 8_000, utilities: 3_000, transport: 5_000,
-      foodDining: 6_000, personalLifestyle: 4_000, miscellaneous: 3_000, total: 59_000,
+      rent: Math.round(30_000 * col),
+      groceries: Math.round(8_000 * col),
+      utilities: Math.round(3_000 * col),
+      transport: Math.round(5_000 * col),
+      foodDining: Math.round(6_000 * col),
+      personalLifestyle: Math.round(4_000 * col),
+      miscellaneous: Math.round(3_000 * col),
+      total,
     },
     generatedBy: 'ai',
     generatedAt: new Date(),
@@ -84,21 +92,21 @@ describe('SalaryAskService.execute — badge assignment', () => {
     expect(chennai?.badge).toBe('your-base');
   });
 
-  it('Kolkata badge is cheaper (col 75, ratio 0.862 < 0.95)', async () => {
+  it('Kolkata badge is cheaper (col 0.71, ratio 0.71 < 0.95)', async () => {
     const { svc } = makeService();
     const result = await svc.execute(BASE_DTO);
     const kolkata = result.cityComparisons.find((c) => c.city === 'Kolkata');
     expect(kolkata?.badge).toBe('cheaper');
   });
 
-  it('Hyderabad badge is similar (ratio 1.034 ≤ 1.07)', async () => {
+  it('Hyderabad badge is cheaper (col 0.92, ratio 0.92 < 0.95)', async () => {
     const { svc } = makeService();
     const result = await svc.execute(BASE_DTO);
     const hyd = result.cityComparisons.find((c) => c.city === 'Hyderabad');
-    expect(hyd?.badge).toBe('similar');
+    expect(hyd?.badge).toBe('cheaper');
   });
 
-  it('Mumbai badge is premium (col 115, ratio 1.322 ≤ 1.35)', async () => {
+  it('Mumbai badge is premium (col 1.31, ratio 1.31 <= 1.35)', async () => {
     const { svc } = makeService();
     const result = await svc.execute(BASE_DTO);
     const mumbai = result.cityComparisons.find((c) => c.city === 'Mumbai');

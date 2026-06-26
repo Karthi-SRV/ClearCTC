@@ -25,4 +25,8 @@ Thumbs.db
 .dev/
 scripts/
 
-backend/coverage/
+# Test coverage
+coverage
+coverage/*
+**/coverage
+**/coverage/*

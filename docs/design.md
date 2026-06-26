@@ -145,7 +145,7 @@ All extend `AiResponseParser` which strips ` ```json ``` ` fences before `JSON.p
 Binds `DATA_SOURCE` token to `CachedDataSource`.
 
 **`CachedDataSource`** (active):
-- `getCOLIndex(city)` — static in-memory lookup, 70+ cities, Bangalore = 100. WFH/remote → null.
+- `getCOLIndex(city)` — queries MongoDB `city-expenses` collection (schema field `colIndex`) for the city's cost-of-living index, calculated relative to Chennai = 1.00 base. WFH/remote → null.
 - `getCompany(name)` — case-insensitive regex match on `name` or `aliases[]`.
 - `getBenchmark(company, role, experienceYears)` — role title match + experience range lookup.
 - `getCompanyNames()` — sorted list from DB.
@@ -273,12 +273,12 @@ See §2.4.
   "familyType": "family",
   "memberCount": 4,
   "hikedCtcLpa": 23.4,
-  "colIndices": { "Mumbai": 115, "Pune": 88, "..." : "..." },
+  "colIndices": { "Mumbai": 1.31, "Pune": 1.07, "..." : "..." },
   "cityComparisons": [
     {
       "city": "Mumbai",
       "badge": "premium",
-      "colIndex": 115,
+      "colIndex": 1.31,
       "equivCtcLpa": 20.7,
       "equivCtcRangeLow": 19.7,
       "equivCtcRangeHigh": 21.7,
