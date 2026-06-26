@@ -1,4 +1,4 @@
-# Claude Code Skills & MCP Servers — comp-copilot
+# Claude Code Skills & MCP Servers — clearctc
 
 This document explains two productivity mechanisms used in this project during development: **Claude Code Skills** (reusable prompt libraries that load exact context on demand) and **MCP Servers** (protocol-based live data connections). Both exist for the same reason: reduce the tokens spent re-explaining project context so Claude spends those tokens doing actual work.
 
@@ -20,8 +20,8 @@ For this project, all skill files are also checked in under `skills/` at the rep
 |----------------|-------------|
 | Every session starts cold — you re-explain the dev stack, the trust boundary, the AI DI token pattern | One trigger word loads hundreds of tokens of accurate, project-specific context |
 | Claude guesses at formulas it learned in training (may be outdated or wrong) | Skill file encodes the exact formula with no ambiguity |
-| Debugging a 502 AI error: 600 tokens explaining what `AiResponseParser` does before getting to the bug | `/comp-copilot-debug-ai` → Claude already knows the validation gates |
-| "How do I add a city?" → 400-token explanation of COL index + seed list + admin endpoint | `/comp-copilot-new-city` → step-by-step in one shot |
+| Debugging a 502 AI error: 600 tokens explaining what `AiResponseParser` does before getting to the bug | `/clearctc-debug-ai` → Claude already knows the validation gates |
+| "How do I add a city?" → 400-token explanation of COL index + seed list + admin endpoint | `/clearctc-new-city` → step-by-step in one shot |
 
 **The key insight:** a skill is not a macro. It is a knowledge module. The skill file contains the WHY (design decisions, invariants, failure modes) alongside the HOW (commands, file paths, schemas). Claude reads it as a peer reading a technical brief, not as a script to execute.
 
@@ -34,7 +34,7 @@ For this project, all skill files are also checked in under `skills/` at the rep
 **File:** `skills/indian-payroll-math/SKILL.md`
 **Purpose:** Applies exact statutory formulas for Indian compensation — new-regime tax, PF, gratuity, COL adjustment, salary range, confidence level. Every formula is specified with no room for improvisation.
 
-**Why it exists here:** `CompensationService` is the financial engine of comp-copilot. The trust boundary rule says the AI never originates financial figures — but the AI *can* help verify, explain, and test those formulas. This skill ensures that when we discuss the compensation math (debugging a test, adding a new formula, or reviewing edge cases), Claude uses the exact same statutory rules as the codebase. Prevents drift between the skill's mental model and the actual implementation.
+**Why it exists here:** `CompensationService` is the financial engine of clearctc. The trust boundary rule says the AI never originates financial figures — but the AI *can* help verify, explain, and test those formulas. This skill ensures that when we discuss the compensation math (debugging a test, adding a new formula, or reviewing edge cases), Claude uses the exact same statutory rules as the codebase. Prevents drift between the skill's mental model and the actual implementation.
 
 **What it covers:**
 - Employee and employer PF (₹15,000/month wage ceiling)
@@ -48,9 +48,9 @@ For this project, all skill files are also checked in under `skills/` at the rep
 
 ---
 
-#### 2. `/comp-copilot-devstack` — Local dev quick-start
+#### 2. `/clearctc-devstack` — Local dev quick-start
 
-**File:** `skills/comp-copilot-devstack/SKILL.md`
+**File:** `skills/clearctc-devstack/SKILL.md`
 **Purpose:** Everything needed to get the local development environment running from scratch: env setup, Docker Compose commands, backend and frontend start commands, seed script, test commands, and a common-failures table.
 
 **Why it exists:** The stack has six services (NestJS, React, MongoDB, Redis, Grafana, Loki/Prometheus) plus an optional Ollama container. Without a skill, every new session that involves running the app requires re-explaining port numbers, env var names, Docker network names, and the seed script invocation. The skill removes this overhead entirely.
@@ -59,9 +59,9 @@ For this project, all skill files are also checked in under `skills/` at the rep
 
 ---
 
-#### 3. `/comp-copilot-debug-ai` — AI pipeline debugging guide
+#### 3. `/clearctc-debug-ai` — AI pipeline debugging guide
 
-**File:** `skills/comp-copilot-debug-ai/SKILL.md`
+**File:** `skills/clearctc-debug-ai/SKILL.md`
 **Purpose:** Diagnostic reference for AI pipeline failures — 502 errors, quota exhaustion, provider switching, and trust-boundary contract enforcement.
 
 **Why it exists:** The AI pipeline has two distinct error categories that look similar on the surface: hard quota exhaustion (`[GEMINI_QUOTA_EXHAUSTED]` prefix → abort immediately, never retry) vs soft 429 rate-limit (retry with backoff). Getting this distinction wrong in a debugging session leads to either burning quota retrying a dead key, or stopping a retriable error too early. The skill encodes the exact distinction and the correct response to each.
@@ -76,9 +76,9 @@ For this project, all skill files are also checked in under `skills/` at the rep
 
 ---
 
-#### 4. `/comp-copilot-new-city` — Add a city to the expense system
+#### 4. `/clearctc-new-city` — Add a city to the expense system
 
-**File:** `skills/comp-copilot-new-city/SKILL.md`
+**File:** `skills/clearctc-new-city/SKILL.md`
 **Purpose:** Step-by-step procedure for adding an Indian city to the cost-of-living expense system: COL index entry, seed list, AI data generation, verification, and cleanup.
 
 **Why it exists:** Adding a city touches three different places (COL index, seed list, MongoDB collection) plus an optional Redis cache invalidation. Missing any one of them causes a silent partial failure — the city appears in the UI but salary adjustments don't work, or it's in the DB but not indexed. The skill prevents this by making the multi-step procedure explicit and checkable.
@@ -223,7 +223,7 @@ Add to `.claude/settings.local.json`:
       "command": "npx",
       "args": [
         "-y", "@mongodb-js/mongodb-mcp-server",
-        "--connectionString", "mongodb://localhost:27017/comp-copilot"
+        "--connectionString", "mongodb://localhost:27017/clearctc"
       ]
     }
   }
@@ -242,7 +242,7 @@ The two mechanisms complement each other:
 User: "Why is the Mumbai salary comparison returning low confidence?"
 
 Claude:
-  1. Loads /comp-copilot-debug-ai skill → knows the confidence downgrade rules
+  1. Loads /clearctc-debug-ai skill → knows the confidence downgrade rules
   2. Calls MongoDB MCP → queries city-expenses for Mumbai's generatedAt date
   3. Calls MongoDB MCP → queries companies for missing Wipro/Infosys aiProfile
   4. Reads compensation.service.ts → finds the confidence formula

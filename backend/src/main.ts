@@ -9,7 +9,7 @@ import { AppModule } from './app.module.js';
 import { AiExceptionFilter } from './shared/filters/ai-exception.filter.js';
 import { CompanyAiProfileService } from './core/data/company-ai-profile.service.js';
 
-collectDefaultMetrics({ prefix: 'comp_copilot_' });
+collectDefaultMetrics({ prefix: 'clearctc_' });
 
 // Monitor parent process — exit immediately if nest --watch (our parent) dies
 if (process.pid && process.ppid) {
@@ -157,7 +157,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AiExceptionFilter());
 
   const config = new DocumentBuilder()
-    .setTitle('Comp Copilot API')
+    .setTitle('ClearCTC API')
     .setDescription('API for Salary and Offer Comparisons')
     .setVersion('1.0')
     .addBearerAuth()

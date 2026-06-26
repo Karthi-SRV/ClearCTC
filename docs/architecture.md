@@ -283,7 +283,7 @@ Generic              → AI_CLIENT               → follows AI_PROVIDER env
 | redis | 6379 | City expense cache |
 | grafana | 3001 | Metrics dashboard — reads Prometheus metrics from backend |
 
-Backend exposes Prometheus metrics at the default `prom-client` endpoint. `collectDefaultMetrics` is called with prefix `comp_copilot_`.
+Backend exposes Prometheus metrics at the default `prom-client` endpoint. `collectDefaultMetrics` is called with prefix `clearctc_`.
 
 ---
 
@@ -291,7 +291,7 @@ Backend exposes Prometheus metrics at the default `prom-client` endpoint. `colle
 
 ```
 # backend/.env
-MONGODB_URI=mongodb://localhost:27017/comp-copilot
+MONGODB_URI=mongodb://localhost:27017/clearctc
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=<secret>
 JWT_EXPIRES_IN=7d
