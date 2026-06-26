@@ -1,0 +1,825 @@
+/* ── Interview Tracking Styles ────────────────────────────────────────────── */
+
+.ftrack-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.ftrack-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.ftrack-header h2 {
+  margin: 0;
+}
+
+/* Controls Panel */
+.ftrack-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.ftrack-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.ftrack-search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.ftrack-filter-buttons,
+.ftrack-view-toggle {
+  display: flex;
+  background: var(--border);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  gap: 2px;
+}
+
+/* Button variants */
+.ftrack-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.ftrack-btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ftrack-btn--primary:hover {
+  filter: brightness(1.1);
+}
+
+.ftrack-btn--secondary {
+  border: 1px solid var(--border);
+}
+
+.ftrack-btn--secondary:hover:not(:disabled) {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.ftrack-btn--active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ftrack-btn--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Kanban Board Layout */
+.ftrack-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: start;
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+
+@media (max-width: 1024px) {
+  .ftrack-board {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ftrack-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ftrack-board-column {
+  background: var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ftrack-board-column-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.ftrack-board-column-header h4 {
+  margin: 0;
+  flex: 1;
+  font-size: 14px;
+}
+
+.ftrack-column-count {
+  font-size: 11px;
+  background: var(--surface);
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.ftrack-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.ftrack-status-dot--in-progress { background: var(--blue); }
+.ftrack-status-dot--hold { background: var(--amber); }
+.ftrack-status-dot--offer-released { background: var(--accent); }
+.ftrack-status-dot--selected { background: var(--green); }
+.ftrack-status-dot--rejected { background: var(--red); }
+
+.ftrack-board-column-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.ftrack-board-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 24px 0;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  opacity: 0.6;
+}
+
+/* Kanban Card Styles */
+.ftrack-card {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ftrack-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-border);
+}
+
+.ftrack-card-header h5 {
+  margin: 0 0 2px 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ftrack-card-role {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: block;
+}
+
+.ftrack-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.ftrack-proposed-badge {
+  background: var(--green-bg);
+  color: var(--green);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.ftrack-card-rounds {
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.ftrack-rounds-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.ftrack-round-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.ftrack-round-pill--completed { background: var(--green-bg); color: var(--green); }
+.ftrack-round-pill--pending { background: var(--border); color: var(--text-muted); }
+.ftrack-round-pill--expected { background: var(--blue-bg); color: var(--blue); }
+.ftrack-round-pill--waiting { background: var(--amber-bg); color: var(--amber); }
+
+.ftrack-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.ftrack-card-btn {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.ftrack-card-btn--edit {
+  color: var(--accent);
+}
+.ftrack-card-btn--edit:hover {
+  background: var(--accent-bg);
+}
+
+.ftrack-card-btn--delete {
+  color: var(--red);
+}
+.ftrack-card-btn--delete:hover {
+  background: var(--red-bg);
+}
+
+/* Badges for status */
+.ftrack-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.ftrack-badge--in-progress { background: var(--blue-bg); color: var(--blue); }
+.ftrack-badge--hold { background: var(--amber-bg); color: var(--amber); }
+.ftrack-badge--offer-released { background: var(--accent-bg); color: var(--accent); }
+.ftrack-badge--selected { background: var(--green-bg); color: var(--green); }
+.ftrack-badge--rejected { background: var(--red-bg); color: var(--red); }
+
+/* Recruiter Contact info cell */
+.ftrack-contact-info div {
+  font-weight: 500;
+  font-size: 13px;
+}
+.ftrack-contact-info small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Modal Dialog Styles */
+.ftrack-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ftrack-modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.ftrack-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ftrack-modal-header h3 {
+  margin: 0;
+}
+
+.ftrack-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.ftrack-modal-close:hover {
+  color: var(--text);
+}
+
+.ftrack-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ftrack-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .ftrack-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ftrack-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ftrack-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ftrack-input,
+.ftrack-select,
+.ftrack-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ftrack-input--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.ftrack-select--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  width: auto;
+}
+
+.ftrack-input:focus,
+.ftrack-select:focus,
+.ftrack-textarea:focus {
+  border-color: var(--accent-border);
+}
+
+.ftrack-input--error {
+  border-color: var(--red) !important;
+}
+
+.ftrack-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.ftrack-inline-add {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ftrack-inline-add .ftrack-input {
+  flex: 1;
+}
+
+/* Edit rounds list inside Form */
+.ftrack-rounds-section {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.ftrack-rounds-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ftrack-rounds-title-row h4 {
+  margin: 0;
+}
+
+.ftrack-rounds-list-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  background: var(--bg);
+}
+
+.ftrack-round-item-edit {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.ftrack-round-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.ftrack-round-item-header h5 {
+  margin: 0;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ftrack-round-item-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ftrack-round-questions-edit {
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.ftrack-questions-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ftrack-question-tag {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ftrack-remove-question {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--red);
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.ftrack-questions-empty {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.ftrack-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+}
+
+.ftrack-loading,
+.ftrack-error-banner {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.ftrack-error-banner {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* ── Drawer Component ──────────────────────────────────────────────────────── */
+
+/*
+ * The overlay is a full-screen backdrop only — no flex layout for the drawer.
+ * The drawer positions itself with `right` so it has no CSS transform, which
+ * matters: any transform (even translateX(0)) on an ancestor creates a new
+ * containing block for position:fixed descendants, breaking the dropdown coords.
+ */
+.ftrack-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
+}
+
+.ftrack-drawer-overlay--open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.ftrack-drawer {
+  position: fixed;
+  top: 0;
+  right: -560px;   /* off-screen when closed */
+  bottom: 0;
+  width: 100%;
+  max-width: 550px;
+  background: var(--surface);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text);
+  border-left: 1px solid var(--border);
+  z-index: 1001;
+}
+
+.ftrack-drawer--open {
+  right: 0;
+}
+
+.ftrack-drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+}
+
+.ftrack-drawer-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.ftrack-drawer-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  padding: 4px;
+  line-height: 1;
+}
+
+.ftrack-drawer-close:hover {
+  color: var(--text);
+}
+
+.ftrack-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.ftrack-drawer-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: var(--surface);
+}
+
+/* ── Searchable Select Component ───────────────────────────────────────────── */
+.ftrack-searchable-select {
+  position: relative;
+  width: 100%;
+}
+
+.ftrack-searchable-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ftrack-searchable-input {
+  width: 100%;
+  padding-right: 32px !important;
+}
+
+.ftrack-searchable-chevron {
+  position: absolute;
+  right: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 0.8rem;
+}
+
+.ftrack-searchable-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1010;
+  list-style: none;
+  padding: 4px 0;
+}
+
+.ftrack-searchable-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+  color: var(--text);
+}
+
+.ftrack-searchable-option:hover,
+.ftrack-searchable-option--active {
+  background: var(--border);
+}
+
+.ftrack-searchable-option--selected {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.ftrack-searchable-option--add {
+  color: var(--accent);
+  font-weight: 600;
+  border-top: 1px dashed var(--border);
+  margin-top: 4px;
+}
+
+.ftrack-searchable-option--add:hover {
+  background: var(--accent-bg);
+}
+
+.ftrack-searchable-no-results {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Drawer Form Layout ────────────────────────────────────────────────────── */
+
+/* The form itself — no extra padding, drawer-body already has it */
+.ftrack-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Each logical section (Company, Contact, Compensation, Status) */
+.ftrack-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+}
+
+.ftrack-section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* Uppercase micro-label used as a section divider title */
+.ftrack-section__title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin: 0 0 4px 0;
+}
+
+/* 2-column field row */
+.ftrack-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .ftrack-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Active Round Highlights ───────────────────────────────────────────────── */
+.ftrack-round-item-edit--active {
+  border: 2px solid var(--accent) !important;
+  box-shadow: 0 0 8px rgba(var(--accent), 0.15);
+  background: var(--accent-bg) !important;
+}
+
+.ftrack-round-active-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-left: 8px;
+  text-transform: uppercase;
+}
+
+/* ── New Status Badges and Dots ────────────────────────────────────────────── */
+.ftrack-status-dot--shared-resume { background: var(--text-muted); }
+.ftrack-badge--shared-resume { background: var(--border); color: var(--text-muted); }
+
+.ftrack-status-dot--shortlisted { background: #6f42c1; }
+.ftrack-badge--shortlisted { background: rgba(111, 66, 193, 0.1); color: #6f42c1; }
+
+.ftrack-status-dot[class*="--moved-to-round"] { background: var(--blue); }
+.ftrack-badge[class*="--moved-to-round"] { background: var(--blue-bg); color: var(--blue); }
+
+

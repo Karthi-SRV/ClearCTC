@@ -16,6 +16,7 @@ export class ExpenseBreakdown {
 
 @Schema({ timestamps: false, collection: 'city-expenses' })
 export class CityExpense {
+  _id?: any;
   @Prop({ required: true, unique: true, index: true }) city: string;
   @Prop({ required: false }) colIndex?: number;
   @Prop({ required: false }) isBase?: boolean;

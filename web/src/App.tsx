@@ -10,6 +10,7 @@ import SalaryAskPage from './pages/SalaryAskPage';
 import SalaryComparisonPage from './pages/SalaryComparisonPage';
 import OfferComparisonPage from './pages/OfferComparisonPage';
 import CityExpensePage from './pages/CityExpensePage';
+import InterviewTrackingPage from './pages/InterviewTrackingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 
@@ -45,6 +46,12 @@ const Nav = memo(function Nav() {
             className={({ isActive }) => `app-nav__link${isActive ? ' app-nav__link--active' : ''}`}
           >
             City Expenses
+          </NavLink>
+          <NavLink
+            to="/interviews"
+            className={({ isActive }) => `app-nav__link${isActive ? ' app-nav__link--active' : ''}`}
+          >
+            Interviews
           </NavLink>
           <div className="app-nav__spacer" />
           <span className="app-nav__user">{user?.email}</span>
@@ -93,6 +100,7 @@ function AppRoutes() {
       <Route path="/salary-comparison"  element={<PrivateRoute><SalaryComparisonPage /></PrivateRoute>} />
       <Route path="/offer-comparison"   element={<PrivateRoute><OfferComparisonPage /></PrivateRoute>} />
       <Route path="/city-expenses"      element={<PrivateRoute><CityExpensePage /></PrivateRoute>} />
+      <Route path="/interviews"         element={<PrivateRoute><InterviewTrackingPage /></PrivateRoute>} />
     </Routes>
   );
 }

@@ -52,7 +52,6 @@ export class CompanyDetailsDto {
   reviews: CompanyReviewDto[];
 }
 
-
 export class QuickSalaryComparisonResponseDto {
   userId: string;
   comparedAt: string;

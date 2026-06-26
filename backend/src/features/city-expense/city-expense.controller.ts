@@ -1,6 +1,14 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Post,
+  Body,
+  BadRequestException,
+} from '@nestjs/common';
 import { CityExpenseService } from '../../core/city-expense/city-expense.service.js';
 import { Public } from '../../shared/decorators/public.decorator.js';
+import { AddCityDto } from './dtos/add-city.dto.js';
 
 @Controller('api/v1')
 export class CityExpenseController {
@@ -9,13 +17,26 @@ export class CityExpenseController {
   /**
    * GET /api/v1/cities
    * Returns a sorted list of city names available in the database.
-   * Response: { cities: string[] }
    */
   @Public()
   @Get('cities')
-  async getCities(): Promise<{ cities: string[] }> {
-    const cities = await this.service.getCityNames();
+  async getCities(): Promise<{ cities: Array<{ _id: string; city: string }> }> {
+    const cities = await this.service.getCitiesWithIds();
     return { cities };
+  }
+
+  @Post('cities')
+  async addCity(@Body() dto: AddCityDto) {
+    try {
+      const cityDoc = await this.service.findOrCreate(dto.city);
+      const cities = await this.service.getCitiesWithIds();
+      return {
+        cities,
+        city: { _id: cityDoc._id.toString(), city: cityDoc.city },
+      };
+    } catch (err: any) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   /**
@@ -34,7 +55,9 @@ export class CityExpenseController {
   @Get('city-expenses')
   async getAll(@Query('city') cityParam?: string | string[]) {
     const rawList = cityParam
-      ? (Array.isArray(cityParam) ? cityParam : [cityParam])
+      ? Array.isArray(cityParam)
+        ? cityParam
+        : [cityParam]
       : [];
 
     const cities = rawList.flatMap((c) => c.split(','));
@@ -42,6 +65,7 @@ export class CityExpenseController {
     const docs = await this.service.getExpensesByFilter(cities);
 
     return docs.map((d) => ({
+      _id: d._id,
       city: d.city,
       generatedAt: d.generatedAt,
       disclaimer: d.disclaimer,

@@ -3,18 +3,40 @@ import { AiParseError } from '../ai/ai-parse.error.js';
 
 const validCompanyData = {
   aliases: ['Acme Corp'],
-  roles: [{ title: 'SDE2', avgCTC: 2500000, experienceMin: 2, experienceMax: 5 }],
-  ratings: [{ source: 'Glassdoor', wlb: 4, culture: 4.2, growth: 3.8, jobSecurity: 4.1 }],
-  reviews: [{ text: 'Good WLB', source: 'Glassdoor', date: '2024-06', sentiment: 'positive', dimension: 'wlb' }],
+  roles: [
+    { title: 'SDE2', avgCTC: 2500000, experienceMin: 2, experienceMax: 5 },
+  ],
+  ratings: [
+    {
+      source: 'Glassdoor',
+      wlb: 4,
+      culture: 4.2,
+      growth: 3.8,
+      jobSecurity: 4.1,
+    },
+  ],
+  reviews: [
+    {
+      text: 'Good WLB',
+      source: 'Glassdoor',
+      date: '2024-06',
+      sentiment: 'positive',
+      dimension: 'wlb',
+    },
+  ],
 };
 
 function makeService(aiResponse: object | Error) {
   const ai = {
-    call: jest.fn().mockImplementation(() =>
-      aiResponse instanceof Error ? Promise.reject(aiResponse) : Promise.resolve(aiResponse),
-    ),
+    call: jest
+      .fn()
+      .mockImplementation(() =>
+        aiResponse instanceof Error
+          ? Promise.reject(aiResponse)
+          : Promise.resolve(aiResponse),
+      ),
   };
-  return new CompanyFetchService(ai as never);
+  return new CompanyFetchService(ai);
 }
 
 describe('CompanyFetchService.fetchCompany', () => {
@@ -29,7 +51,12 @@ describe('CompanyFetchService.fetchCompany', () => {
   });
 
   it('throws AiParseError when AI response fails validation (missing roles)', async () => {
-    const service = makeService({ aliases: [], roles: [], ratings: [], reviews: [] });
+    const service = makeService({
+      aliases: [],
+      roles: [],
+      ratings: [],
+      reviews: [],
+    });
     await expect(service.fetchCompany('Acme')).rejects.toThrow(AiParseError);
   });
 

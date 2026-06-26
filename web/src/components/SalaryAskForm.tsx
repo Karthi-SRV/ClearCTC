@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import type { Phase1Response } from '../types';
-import CityCombobox from './CityCombobox';
+import Combobox from './Combobox';
+import { useCities } from '../context/CitiesContext';
 import { useApiFetch } from '../hooks/useApiFetch';
 import { SALARY_ASKS } from '../constants/api';
 
@@ -39,6 +40,7 @@ function validate(f: Fields): Errors {
 
 export default function SalaryAskForm({ onResult, initialCity, initialCtcLpa, initialHikePct }: Props) {
   const apiFetch = useApiFetch();
+  const { cities } = useCities();
   const [fields, setFields] = useState<Fields>({
     currentCity: initialCity ?? '',
     currentCtcLpa: initialCtcLpa ?? '',
@@ -85,12 +87,18 @@ export default function SalaryAskForm({ onResult, initialCity, initialCtcLpa, in
 
         <div className={`p1-form__row-field${errors.currentCity ? ' p1-form__field--error' : ''}`}>
           <label className="p1-form__label" htmlFor="currentCity">City</label>
-          <CityCombobox
+          <Combobox<string>
             id="currentCity"
+            options={cities}
             value={fields.currentCity}
             onChange={(city) => set('currentCity', city)}
+            getOptionLabel={(c) => c}
+            getOptionValue={(c) => c}
             error={errors.currentCity}
             placeholder="e.g. Bangalore"
+            propagateQueryOnChange
+            onAdd={async (q) => q}
+            addingText="Use"
           />
           {errors.currentCity && (
             <span className="p1-form__error" role="alert">{errors.currentCity}</span>

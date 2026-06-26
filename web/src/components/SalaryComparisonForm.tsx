@@ -3,8 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useCities } from '../context/CitiesContext';
 import { computeOfferLivePreview } from '../utils/comp-client.util';
-import CityCombobox from './CityCombobox';
-import CompanyCombobox from './CompanyCombobox';
+import Combobox from './Combobox';
 import { useCompanies } from '../context/CompaniesContext';
 import type { SalaryComparisonOfferDto, QuickSalaryComparisonResponseDto } from '../types';
 import { SALARY_COMPARISONS } from '../constants/api';
@@ -88,7 +87,7 @@ const OFFER_ACCENT = ['#6366f1', '#0ea5e9', '#10b981'];
 
 const OfferCard = memo(function OfferCard({ index, offer, canRemove, onChange, onRemove }: OfferCardProps) {
   const { cities, loading: citiesLoading } = useCities();
-  const { loading: companiesLoading } = useCompanies();
+  const { companies, loading: companiesLoading } = useCompanies();
   const accent = OFFER_ACCENT[index] ?? '#6366f1';
 
   return (
@@ -115,10 +114,17 @@ const OfferCard = memo(function OfferCard({ index, offer, canRemove, onChange, o
             Company name
             {companiesLoading && <em className="p2r-note"> loading…</em>}
           </label>
-          <CompanyCombobox
+          <Combobox<string>
             id={`company-sc-${index}`}
+            options={companies}
             value={offer.companyName}
             onChange={company => onChange({ companyName: company })}
+            getOptionLabel={(c) => c}
+            getOptionValue={(c) => c}
+            placeholder={companies.length ? 'e.g. TCS' : 'Loading companies…'}
+            propagateQueryOnChange
+            onAdd={async (q) => q}
+            addingText="Use"
           />
         </div>
 
@@ -237,11 +243,17 @@ const OfferCard = memo(function OfferCard({ index, offer, canRemove, onChange, o
               Target city
               {citiesLoading && <em className="p2r-note"> loading…</em>}
             </label>
-            <CityCombobox
+            <Combobox<string>
               id={`city-sc-${index}`}
+              options={cities}
               value={offer.targetCity}
               onChange={city => onChange({ targetCity: city })}
+              getOptionLabel={(c) => c}
+              getOptionValue={(c) => c}
               placeholder={cities.length ? 'e.g. Bangalore' : 'Loading cities…'}
+              propagateQueryOnChange
+              onAdd={async (q) => q}
+              addingText="Use"
             />
           </div>
         )}

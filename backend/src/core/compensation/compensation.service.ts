@@ -158,33 +158,41 @@ export class CompensationService {
     colIndexUsed: number,
   ): OfferSnapshot {
     // Step 1 — annual amounts from LPA inputs
-    const totalCtcAnnual    = input.totalCtcLpa * 100_000;
+    const totalCtcAnnual = input.totalCtcLpa * 100_000;
     const joiningBonusAnnual = input.joiningBonusLpa * 100_000;
 
     // Step 2 — variable
-    const variableAnnual = Math.round(totalCtcAnnual * input.variablePct / 100);
+    const variableAnnual = Math.round(
+      (totalCtcAnnual * input.variablePct) / 100,
+    );
 
     // Step 3 — basic
     // Basic = 50% of (totalCTC − joiningBonus − variable)
-    const basicAnnual  = Math.round((totalCtcAnnual - joiningBonusAnnual - variableAnnual) * 0.5);
+    const basicAnnual = Math.round(
+      (totalCtcAnnual - joiningBonusAnnual - variableAnnual) * 0.5,
+    );
     const basicMonthly = Math.round(basicAnnual / 12);
 
     // Step 4 — employee PF
-    const employeePfMonthly = Math.round(Math.min(basicMonthly, PF_WAGE_CEILING_MONTHLY) * PF_EMPLOYEE_RATE);
-    const employeePfAnnual  = employeePfMonthly * 12;
+    const employeePfMonthly = Math.round(
+      Math.min(basicMonthly, PF_WAGE_CEILING_MONTHLY) * PF_EMPLOYEE_RATE,
+    );
+    const employeePfAnnual = employeePfMonthly * 12;
 
     // Step 5 — employer PF
-    const employerPfAnnual = input.employerPf === 'statutory' ? employeePfAnnual : 0;
+    const employerPfAnnual =
+      input.employerPf === 'statutory' ? employeePfAnnual : 0;
 
     // Step 6 — gratuity accrual (first-year estimate: 15 × basicMonthly / 26)
     const gratuityAccrualAnnual = Math.round((15 * basicMonthly) / 26);
 
     // Step 7 — fixed pay (derived residual — never entered by user)
-    const fixedPayAnnual = totalCtcAnnual
-      - variableAnnual
-      - employerPfAnnual
-      - gratuityAccrualAnnual
-      - joiningBonusAnnual;
+    const fixedPayAnnual =
+      totalCtcAnnual -
+      variableAnnual -
+      employerPfAnnual -
+      gratuityAccrualAnnual -
+      joiningBonusAnnual;
 
     // Step 8 — effective CTC
     const effectiveCtcAnnual = input.variableGuaranteed
@@ -198,13 +206,15 @@ export class CompensationService {
     const incomeTaxAnnual = this.applyTaxSlabs(taxableIncome);
 
     // Step 11 — monthly in-hand
-    const monthlyInHand = Math.round((effectiveCtcAnnual - employeePfAnnual - incomeTaxAnnual) / 12);
-    const annualInHand  = monthlyInHand * 12;
+    const monthlyInHand = Math.round(
+      (effectiveCtcAnnual - employeePfAnnual - incomeTaxAnnual) / 12,
+    );
+    const annualInHand = monthlyInHand * 12;
 
     // Step 12 — city expenses and savings
     const monthlyExpenses = expenseBreakdown.total;
-    const monthlySavings  = monthlyInHand - monthlyExpenses;
-    const annualSavings   = monthlySavings * 12;
+    const monthlySavings = monthlyInHand - monthlyExpenses;
+    const annualSavings = monthlySavings * 12;
 
     return {
       companyName: input.companyName,
@@ -243,15 +253,18 @@ export class CompensationService {
    * Phase 2 uses computeOfferSnapshot for the full derivation.
    */
   computeMonthlyInHandFromLpa(totalCtcLpa: number): number {
-    const totalCtcAnnual        = totalCtcLpa * 100_000;
-    const basicMonthly          = Math.round((totalCtcAnnual * 0.5) / 12);
-    const employeePfMonthly     = Math.round(Math.min(basicMonthly, PF_WAGE_CEILING_MONTHLY) * PF_EMPLOYEE_RATE);
-    const employeePfAnnual      = employeePfMonthly * 12;
-    const employerPfAnnual      = employeePfAnnual; // statutory
+    const totalCtcAnnual = totalCtcLpa * 100_000;
+    const basicMonthly = Math.round((totalCtcAnnual * 0.5) / 12);
+    const employeePfMonthly = Math.round(
+      Math.min(basicMonthly, PF_WAGE_CEILING_MONTHLY) * PF_EMPLOYEE_RATE,
+    );
+    const employeePfAnnual = employeePfMonthly * 12;
+    const employerPfAnnual = employeePfAnnual; // statutory
     const gratuityAccrualAnnual = Math.round((15 * basicMonthly) / 26);
-    const fixedPayAnnual        = totalCtcAnnual - employerPfAnnual - gratuityAccrualAnnual;
-    const taxableIncome         = Math.max(fixedPayAnnual - STANDARD_DEDUCTION, 0);
-    const tax                   = this.applyTaxSlabs(taxableIncome);
+    const fixedPayAnnual =
+      totalCtcAnnual - employerPfAnnual - gratuityAccrualAnnual;
+    const taxableIncome = Math.max(fixedPayAnnual - STANDARD_DEDUCTION, 0);
+    const tax = this.applyTaxSlabs(taxableIncome);
     return Math.round((fixedPayAnnual - employeePfAnnual - tax) / 12);
   }
 

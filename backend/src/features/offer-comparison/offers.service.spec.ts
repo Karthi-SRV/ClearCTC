@@ -8,7 +8,11 @@ describe('OffersService.createMany', () => {
     const service = new OffersService(offerModel as never);
 
     const result = await service.createMany([
-      { userId: new Types.ObjectId().toString(), inputs: { a: 1 }, snapshot: { b: 2 } },
+      {
+        userId: new Types.ObjectId().toString(),
+        inputs: { a: 1 },
+        snapshot: { b: 2 },
+      },
     ]);
 
     expect(result).toBe(inserted);
@@ -22,7 +26,9 @@ describe('OffersService.createMany', () => {
 
     await service.createMany([{ userId, inputs: {}, snapshot: {} }]);
 
-    const [docs] = offerModel.insertMany.mock.calls[0] as [{ userId: Types.ObjectId }[]];
+    const [docs] = offerModel.insertMany.mock.calls[0] as [
+      { userId: Types.ObjectId }[],
+    ];
     expect(docs[0].userId).toBeInstanceOf(Types.ObjectId);
     expect(docs[0].userId.toString()).toBe(userId);
   });

@@ -14,7 +14,10 @@ describe('ClaudeAiClient.parseJson', () => {
   });
 
   it('valid bare JSON → returns parsed object', () => {
-    expect(client.parseJson('{"status":"ok","value":42}')).toEqual({ status: 'ok', value: 42 });
+    expect(client.parseJson('{"status":"ok","value":42}')).toEqual({
+      status: 'ok',
+      value: 42,
+    });
   });
 
   it('response wrapped in ```json ... ``` fences → fences stripped, parses correctly', () => {
@@ -27,7 +30,9 @@ describe('ClaudeAiClient.parseJson', () => {
   });
 
   it('non-JSON response → throws AiParseError', () => {
-    expect(() => client.parseJson('Sorry, I cannot help with that.')).toThrow(AiParseError);
+    expect(() => client.parseJson('Sorry, I cannot help with that.')).toThrow(
+      AiParseError,
+    );
   });
 
   it('JSON array (not an object) → throws AiParseError', () => {
@@ -41,7 +46,10 @@ describe('ClaudeAiClient.parseJson', () => {
 
 describe('ClaudeAiClient.call', () => {
   it('calls Anthropic API and returns parsed response', async () => {
-    const config = { get: (k: string, def: string) => k === 'ANTHROPIC_API_KEY' ? 'test-key' : def } as any;
+    const config = {
+      get: (k: string, def: string) =>
+        k === 'ANTHROPIC_API_KEY' ? 'test-key' : def,
+    } as any;
     const client = new ClaudeAiClient(config);
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
@@ -57,7 +65,10 @@ describe('ClaudeAiClient.call', () => {
   });
 
   it('API error status → throws AiParseError', async () => {
-    const config = { get: (k: string, def: string) => k === 'ANTHROPIC_API_KEY' ? 'test-key' : def } as any;
+    const config = {
+      get: (k: string, def: string) =>
+        k === 'ANTHROPIC_API_KEY' ? 'test-key' : def,
+    } as any;
     const client = new ClaudeAiClient(config);
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,

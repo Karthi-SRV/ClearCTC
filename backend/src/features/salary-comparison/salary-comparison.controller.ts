@@ -17,20 +17,14 @@ export class SalaryComparisonController {
     @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
   ) {}
 
-  @Public()
-  @Get('companies')
-  async getCompanies(): Promise<{ companies: string[] }> {
-    this.logger.log(`GET /api/v1/salary-comparisons/companies`);
-    const companies = await this.dataSource.getCompanyNames();
-    return { companies };
-  }
-
   @Post('')
   quickComparison(
     @CurrentUser() user: AuthPayload,
     @Body() dto: QuickSalaryComparisonDto,
   ) {
-    this.logger.log(`POST /api/v1/salary-comparisons | userId: ${user.sub} | offerCount: ${dto.offers?.length || 0}`);
+    this.logger.log(
+      `POST /api/v1/salary-comparisons | userId: ${user.sub} | offerCount: ${dto.offers?.length || 0}`,
+    );
     return this.salaryComparison.execute(user.sub, dto);
   }
 }

@@ -1,7 +1,11 @@
 import { CityExpenseAdminController } from './city-expense-admin.controller.js';
 
-function makeController(forceRefreshImpl: (city: string) => Promise<void> = () => Promise.resolve()) {
-  const service = { forceRefresh: jest.fn().mockImplementation(forceRefreshImpl) };
+function makeController(
+  forceRefreshImpl: (city: string) => Promise<void> = () => Promise.resolve(),
+) {
+  const service = {
+    forceRefresh: jest.fn().mockImplementation(forceRefreshImpl),
+  };
   return { ctrl: new CityExpenseAdminController(service as never), service };
 }
 
@@ -25,9 +29,11 @@ describe('CityExpenseAdminController.refresh', () => {
 
   it('marks failed cities as rejected in results', async () => {
     const { ctrl } = makeController((city) =>
-      city === 'Bangalore' ? Promise.reject(new Error('AI timeout')) : Promise.resolve(),
+      city === 'Bangalore'
+        ? Promise.reject(new Error('AI timeout'))
+        : Promise.resolve(),
     );
-    const result = await ctrl.refresh({ city: 'Bangalore' }) as {
+    const result = (await ctrl.refresh({ city: 'Bangalore' })) as {
       results: { status: string; error?: string }[];
     };
 
@@ -37,7 +43,7 @@ describe('CityExpenseAdminController.refresh', () => {
 
   it('marks successful cities as fulfilled', async () => {
     const { ctrl } = makeController();
-    const result = await ctrl.refresh({ city: 'Pune' }) as {
+    const result = (await ctrl.refresh({ city: 'Pune' })) as {
       results: { status: string }[];
     };
     expect(result.results[0].status).toBe('fulfilled');

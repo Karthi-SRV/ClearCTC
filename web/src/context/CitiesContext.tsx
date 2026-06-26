@@ -37,9 +37,10 @@ async function fetchCities(apiFetch: ReturnType<typeof useApiFetch>): Promise<st
       try {
         const r = await apiFetch(CITIES);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const d = await r.json() as { cities: string[] };
-        _cache = d.cities;
-        return d.cities;
+        const d = await r.json() as { cities: any[] };
+        const names = d.cities.map((c) => (typeof c === 'string' ? c : c.city));
+        _cache = names;
+        return names;
       } catch (err) {
         _promise = null; // allow retry on next mount
         throw err;

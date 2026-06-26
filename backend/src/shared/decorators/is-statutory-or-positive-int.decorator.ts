@@ -18,9 +18,7 @@ export function IsStatutoryOrPositiveInt(options?: ValidationOptions) {
         validate(value: unknown, _args: ValidationArguments) {
           if (value === 'statutory') return true;
           return (
-            typeof value === 'number' &&
-            Number.isInteger(value) &&
-            value > 0
+            typeof value === 'number' && Number.isInteger(value) && value > 0
           );
         },
       },

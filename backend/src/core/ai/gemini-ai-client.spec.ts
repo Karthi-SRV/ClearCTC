@@ -67,7 +67,9 @@ describe('GeminiAiClient.call — success path', () => {
 describe('GeminiAiClient.call — error paths', () => {
   it('network error → throws AiParseError', async () => {
     mockFetch.mockRejectedValue(new Error('ECONNREFUSED'));
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 
   it('HTTP 4xx → throws AiParseError with status info', async () => {
@@ -77,7 +79,9 @@ describe('GeminiAiClient.call — error paths', () => {
       statusText: 'Forbidden',
       text: async () => 'API key not valid',
     });
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 
   it('empty candidates → throws AiParseError', async () => {
@@ -85,16 +89,22 @@ describe('GeminiAiClient.call — error paths', () => {
       ok: true,
       json: async () => ({ candidates: [] }),
     });
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 
   it('non-JSON text → throws AiParseError', async () => {
     geminiOk('Sorry, I cannot help with that.');
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 
   it('JSON array response → throws AiParseError', async () => {
     geminiOk('[1, 2, 3]');
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 });

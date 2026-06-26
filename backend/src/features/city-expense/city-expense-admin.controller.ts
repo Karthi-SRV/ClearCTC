@@ -17,9 +17,7 @@ export class CityExpenseAdminController {
   constructor(private readonly cityExpense: CityExpenseService) {}
 
   @Post('refresh')
-  async refresh(
-    @Body() body: { city?: string },
-  ): Promise<object> {
+  async refresh(@Body() body: { city?: string }): Promise<object> {
     const cities = body.city ? [body.city] : STANDARD_CITIES;
     const results = await Promise.allSettled(
       cities.map((c) => this.cityExpense.forceRefresh(c)),
@@ -30,7 +28,7 @@ export class CityExpenseAdminController {
         city,
         status: results[i].status,
         ...(results[i].status === 'rejected' && {
-          error: (results[i] as PromiseRejectedResult).reason?.message,
+          error: results[i].reason?.message,
         }),
       })),
     };

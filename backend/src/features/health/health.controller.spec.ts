@@ -4,21 +4,24 @@ import type { Connection } from 'mongoose';
 
 function makeController(readyState: number, pingResult: 'ok' | Error) {
   const redis = {
-    ping: pingResult instanceof Error
-      ? jest.fn().mockRejectedValue(pingResult)
-      : jest.fn().mockResolvedValue('PONG'),
+    ping:
+      pingResult instanceof Error
+        ? jest.fn().mockRejectedValue(pingResult)
+        : jest.fn().mockResolvedValue('PONG'),
   };
-  return new HealthController(
-    { readyState } as Connection,
-    redis as never,
-  );
+  return new HealthController({ readyState } as Connection, redis as never);
 }
 
 describe('HealthController', () => {
   it('returns ok when db connected and redis pings', async () => {
     const ctrl = makeController(1, 'ok');
     const result = await ctrl.getHealth();
-    expect(result).toEqual({ status: 'ok', db: 'connected', cache: 'ok', uptime: expect.any(Number) });
+    expect(result).toEqual({
+      status: 'ok',
+      db: 'connected',
+      cache: 'ok',
+      uptime: expect.any(Number),
+    });
   });
 
   it('throws 503 when db is disconnected', async () => {
@@ -38,7 +41,11 @@ describe('HealthController', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(HttpException);
       const body = (err as HttpException).getResponse();
-      expect(body).toMatchObject({ status: 'degraded', db: 'disconnected', cache: 'error' });
+      expect(body).toMatchObject({
+        status: 'degraded',
+        db: 'disconnected',
+        cache: 'error',
+      });
     }
   });
 });

@@ -55,7 +55,9 @@ export class GeminiAiClient extends AiResponseParser {
           body: reqBody,
         });
       } catch (err: unknown) {
-        throw new AiParseError(`Gemini connection error: ${err instanceof Error ? err.message : String(err)}`);
+        throw new AiParseError(
+          `Gemini connection error: ${err instanceof Error ? err.message : String(err)}`,
+        );
       }
 
       if (response.status === 429) {
@@ -65,8 +67,8 @@ export class GeminiAiClient extends AiResponseParser {
         if (isQuotaExhausted(body)) {
           throw new AiParseError(
             `${GEMINI_QUOTA_EXHAUSTED_PREFIX} Account quota exhausted. ` +
-            `Get a new API key at https://aistudio.google.com/apikey or wait for the daily reset. ` +
-            `Original error: ${body.slice(0, 200)}`,
+              `Get a new API key at https://aistudio.google.com/apikey or wait for the daily reset. ` +
+              `Original error: ${body.slice(0, 200)}`,
           );
         }
 
@@ -80,7 +82,7 @@ export class GeminiAiClient extends AiResponseParser {
         // Retries exhausted.
         throw new AiParseError(
           `Gemini API error: 429 Too Many Requests (${MAX_RETRIES} retries exhausted). ` +
-          body.slice(0, 200),
+            body.slice(0, 200),
         );
       }
 
@@ -107,8 +109,9 @@ export class GeminiAiClient extends AiResponseParser {
     const usage = data.usageMetadata;
     const promptTokens = usage?.promptTokenCount ?? 0;
     const outputTokens = usage?.candidatesTokenCount ?? 0;
-    const totalTokens = usage?.totalTokenCount ?? (promptTokens + outputTokens);
-    const costUsd = (promptTokens * 0.075) / 1_000_000 + (outputTokens * 0.3) / 1_000_000;
+    const totalTokens = usage?.totalTokenCount ?? promptTokens + outputTokens;
+    const costUsd =
+      (promptTokens * 0.075) / 1_000_000 + (outputTokens * 0.3) / 1_000_000;
 
     this.logger.log(
       `Gemini call | Model: ${this.model} | Duration: ${durationMs}ms | ` +

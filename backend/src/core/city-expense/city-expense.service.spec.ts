@@ -1,4 +1,7 @@
-import { CityExpenseService, CityExpenseUnavailableError } from './city-expense.service.js';
+import {
+  CityExpenseService,
+  CityExpenseUnavailableError,
+} from './city-expense.service.js';
 import type { CityExpense } from '../../shared/schemas/city-expense.schema.js';
 
 function makeDoc(city: string, fresh = true): CityExpense {
@@ -6,8 +9,14 @@ function makeDoc(city: string, fresh = true): CityExpense {
     ? new Date()
     : new Date(Date.now() - 35 * 24 * 3600 * 1000);
   const breakdown = {
-    rent: 25_000, groceries: 8_000, utilities: 3_000, transport: 5_000,
-    foodDining: 6_000, personalLifestyle: 4_000, miscellaneous: 3_000, total: 54_000,
+    rent: 25_000,
+    groceries: 8_000,
+    utilities: 3_000,
+    transport: 5_000,
+    foodDining: 6_000,
+    personalLifestyle: 4_000,
+    miscellaneous: 3_000,
+    total: 54_000,
   };
   return {
     city,
@@ -31,10 +40,11 @@ function makeService() {
   const findOneAndUpdate = jest.fn().mockImplementation((filter, update) => {
     const setObj = update?.$set || {};
     return {
-      exec: () => Promise.resolve({
-        toObject: () => setObj,
-        ...setObj
-      })
+      exec: () =>
+        Promise.resolve({
+          toObject: () => setObj,
+          ...setObj,
+        }),
     };
   });
   const mockModel = { findOne, findOneAndUpdate };
@@ -49,7 +59,11 @@ function makeService() {
     fetchExpense: jest.fn(),
   };
 
-  const svc = new CityExpenseService(mockModel as any, mockCache as any, mockFetch as any);
+  const svc = new CityExpenseService(
+    mockModel as any,
+    mockCache as any,
+    mockFetch as any,
+  );
   void lean;
   return { svc, mockModel, mockCache, mockFetch, mongoExec: exec };
 }
@@ -131,12 +145,27 @@ describe('CityExpenseService.getCityNames', () => {
   it('returns city names sorted alphabetically', async () => {
     const modelWithFind = {
       find: jest.fn().mockReturnValue({
-        lean: () => ({ exec: () => Promise.resolve([{ city: 'Pune' }, { city: 'Bangalore' }, { city: 'Mumbai' }]) }),
+        lean: () => ({
+          exec: () =>
+            Promise.resolve([
+              { city: 'Pune' },
+              { city: 'Bangalore' },
+              { city: 'Mumbai' },
+            ]),
+        }),
       }),
-      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
-      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+      findOne: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(null) }),
+      }),
+      findOneAndUpdate: jest
+        .fn()
+        .mockReturnValue({ exec: () => Promise.resolve({}) }),
     };
-    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, {} as any);
+    const svc = new CityExpenseService(
+      modelWithFind as any,
+      { get: jest.fn(), set: jest.fn() } as any,
+      {} as any,
+    );
 
     const names = await svc.getCityNames();
     expect(names).toEqual(['Bangalore', 'Mumbai', 'Pune']);
@@ -150,10 +179,18 @@ describe('CityExpenseService.getAllExpenses', () => {
       find: jest.fn().mockReturnValue({
         lean: () => ({ exec: () => Promise.resolve(docs) }),
       }),
-      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
-      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+      findOne: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(null) }),
+      }),
+      findOneAndUpdate: jest
+        .fn()
+        .mockReturnValue({ exec: () => Promise.resolve({}) }),
     };
-    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, {} as any);
+    const svc = new CityExpenseService(
+      modelWithFind as any,
+      { get: jest.fn(), set: jest.fn() } as any,
+      {} as any,
+    );
 
     const result = await svc.getAllExpenses();
     expect(result).toHaveLength(2);
@@ -167,10 +204,18 @@ describe('CityExpenseService.getExpensesByFilter', () => {
       find: jest.fn().mockReturnValue({
         lean: () => ({ exec: () => Promise.resolve(docs) }),
       }),
-      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
-      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+      findOne: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(null) }),
+      }),
+      findOneAndUpdate: jest
+        .fn()
+        .mockReturnValue({ exec: () => Promise.resolve({}) }),
     };
-    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, {} as any);
+    const svc = new CityExpenseService(
+      modelWithFind as any,
+      { get: jest.fn(), set: jest.fn() } as any,
+      {} as any,
+    );
 
     const result = await svc.getExpensesByFilter([]);
     expect(result).toHaveLength(2);
@@ -182,11 +227,21 @@ describe('CityExpenseService.getExpensesByFilter', () => {
       find: jest.fn().mockReturnValue({
         lean: () => ({ exec: () => Promise.resolve(docs) }),
       }),
-      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
-      findOneAndUpdate: jest.fn().mockReturnValue({ exec: () => Promise.resolve({}) }),
+      findOne: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(null) }),
+      }),
+      findOneAndUpdate: jest
+        .fn()
+        .mockReturnValue({ exec: () => Promise.resolve({}) }),
     };
-    const fetchMock = { fetchExpense: jest.fn().mockResolvedValue(makeDoc('Pune')) };
-    const svc = new CityExpenseService(modelWithFind as any, { get: jest.fn(), set: jest.fn() } as any, fetchMock as any);
+    const fetchMock = {
+      fetchExpense: jest.fn().mockResolvedValue(makeDoc('Pune')),
+    };
+    const svc = new CityExpenseService(
+      modelWithFind as any,
+      { get: jest.fn(), set: jest.fn() } as any,
+      fetchMock as any,
+    );
 
     const result = await svc.getExpensesByFilter(['Bangalore', 'Pune']);
     expect(result.length).toBeGreaterThanOrEqual(1);

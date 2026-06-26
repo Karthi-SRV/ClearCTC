@@ -26,7 +26,9 @@ describe('SalaryComparisonController', () => {
       ],
     }).compile();
 
-    controller = module.get<SalaryComparisonController>(SalaryComparisonController);
+    controller = module.get<SalaryComparisonController>(
+      SalaryComparisonController,
+    );
     service = module.get<SalaryComparisonService>(SalaryComparisonService);
   });
 

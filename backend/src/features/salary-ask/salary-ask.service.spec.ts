@@ -2,13 +2,18 @@ import { SalaryAskService } from './salary-ask.service.js';
 import { SalaryAskRequestDto } from './dtos/salary-ask-request.dto.js';
 
 const CITY_COL: Record<string, number> = {
-  kolkata: 0.71, chennai: 1.00, hyderabad: 0.92, pune: 1.07, bangalore: 1.25, mumbai: 1.31,
+  kolkata: 0.71,
+  chennai: 1.0,
+  hyderabad: 0.92,
+  pune: 1.07,
+  bangalore: 1.25,
+  mumbai: 1.31,
 };
 
 // Returns the virtual breakdown object that CityExpenseService.getExpenseBreakdown resolves to
 // (not the raw CityExpense document — the service wraps the doc before returning).
 function makeExpenseDoc(city: string) {
-  const col = CITY_COL[city.toLowerCase()] ?? 1.00;
+  const col = CITY_COL[city.toLowerCase()] ?? 1.0;
   const total = Math.round(58_000 * col);
   return {
     city,
@@ -33,19 +38,21 @@ function makeExpenseDoc(city: string) {
 
 function makeService() {
   const mockComp = {
-    computeMonthlyInHandFromLpa: jest.fn().mockImplementation(
-      (lpa: number) => Math.round((lpa * 100_000) / 12),
-    ),
+    computeMonthlyInHandFromLpa: jest
+      .fn()
+      .mockImplementation((lpa: number) => Math.round((lpa * 100_000) / 12)),
   };
   const mockData = {
-    getCOLIndex: jest.fn().mockImplementation(async (city: string) =>
-      CITY_COL[city.toLowerCase()] ?? null,
-    ),
+    getCOLIndex: jest
+      .fn()
+      .mockImplementation(
+        async (city: string) => CITY_COL[city.toLowerCase()] ?? null,
+      ),
   };
   const mockCityExpense = {
-    getExpenseBreakdown: jest.fn().mockImplementation(async (city: string) =>
-      makeExpenseDoc(city),
-    ),
+    getExpenseBreakdown: jest
+      .fn()
+      .mockImplementation(async (city: string) => makeExpenseDoc(city)),
   };
   const svc = new SalaryAskService(
     mockComp as any,
@@ -78,9 +85,14 @@ describe('SalaryAskService.execute — city response', () => {
     const { svc } = makeService();
     const result = await svc.execute(BASE_DTO);
     // mock only provides COL for these 6; remaining 28 cities use the fallback index
-    expect(Object.keys(result.colIndices).sort()).toEqual(
-      ['Bangalore', 'Chennai', 'Hyderabad', 'Kolkata', 'Mumbai', 'Pune'],
-    );
+    expect(Object.keys(result.colIndices).sort()).toEqual([
+      'Bangalore',
+      'Chennai',
+      'Hyderabad',
+      'Kolkata',
+      'Mumbai',
+      'Pune',
+    ]);
   });
 });
 
@@ -140,13 +152,14 @@ describe('SalaryAskService.execute — confidence', () => {
   it('medium when an expense fetch fails', async () => {
     const { svc, mockCityExpense } = makeService();
     let call = 0;
-    mockCityExpense.getExpenseBreakdown.mockImplementation(async (city: string) => {
-      call++;
-      if (call === 2) throw new Error('AI unavailable');
-      return makeExpenseDoc(city);
-    });
+    mockCityExpense.getExpenseBreakdown.mockImplementation(
+      async (city: string) => {
+        call++;
+        if (call === 2) throw new Error('AI unavailable');
+        return makeExpenseDoc(city);
+      },
+    );
     const result = await svc.execute(BASE_DTO);
     expect(result.confidence).toBe('medium');
   });
 });
-

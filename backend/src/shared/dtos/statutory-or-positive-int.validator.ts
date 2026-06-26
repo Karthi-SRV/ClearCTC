@@ -1,4 +1,7 @@
-import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
+import {
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 
 @ValidatorConstraint({ name: 'isStatutoryOrPositiveInt', async: false })
 export class IsStatutoryOrPositiveIntConstraint implements ValidatorConstraintInterface {

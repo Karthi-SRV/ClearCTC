@@ -13,7 +13,11 @@ describe('OllamaAiClient.call', () => {
     const client = makeClient();
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ message: { content: '{"result":"ok"}' }, prompt_eval_count: 10, eval_count: 5 }),
+      json: async () => ({
+        message: { content: '{"result":"ok"}' },
+        prompt_eval_count: 10,
+        eval_count: 5,
+      }),
     }) as never;
 
     const result = await client.call('system', 'user');
@@ -26,7 +30,10 @@ describe('OllamaAiClient.call', () => {
   });
 
   it('uses configured OLLAMA_BASE_URL and OLLAMA_MODEL', async () => {
-    const client = makeClient({ OLLAMA_BASE_URL: 'http://myollama:11434', OLLAMA_MODEL: 'mistral' });
+    const client = makeClient({
+      OLLAMA_BASE_URL: 'http://myollama:11434',
+      OLLAMA_MODEL: 'mistral',
+    });
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ message: { content: '{"ok":true}' } }),
@@ -34,17 +41,24 @@ describe('OllamaAiClient.call', () => {
 
     await client.call('sys', 'user');
 
-    const [url, init] = (global.fetch as jest.Mock).mock.calls[0] as [string, RequestInit];
+    const [url, init] = (global.fetch as jest.Mock).mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
     expect(url).toBe('http://myollama:11434/api/chat');
     expect(JSON.parse(init.body as string).model).toBe('mistral');
   });
 
   it('throws AiParseError on connection error', async () => {
     const client = makeClient();
-    global.fetch = jest.fn().mockRejectedValue(new Error('ECONNREFUSED')) as never;
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(new Error('ECONNREFUSED')) as never;
 
     await expect(client.call('sys', 'user')).rejects.toThrow(AiParseError);
-    await expect(client.call('sys', 'user')).rejects.toThrow('Ollama connection error');
+    await expect(client.call('sys', 'user')).rejects.toThrow(
+      'Ollama connection error',
+    );
   });
 
   it('throws AiParseError on non-OK HTTP status', async () => {
@@ -56,7 +70,9 @@ describe('OllamaAiClient.call', () => {
     }) as never;
 
     await expect(client.call('sys', 'user')).rejects.toThrow(AiParseError);
-    await expect(client.call('sys', 'user')).rejects.toThrow('Ollama API error: 503');
+    await expect(client.call('sys', 'user')).rejects.toThrow(
+      'Ollama API error: 503',
+    );
   });
 
   it('throws AiParseError when response content is not valid JSON', async () => {

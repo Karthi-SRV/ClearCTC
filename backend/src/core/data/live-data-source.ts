@@ -1,5 +1,9 @@
 import { NotImplementedException } from '@nestjs/common';
-import { BenchmarkResult, CompanyRecord, DataSource } from './data-source.interface.js';
+import {
+  BenchmarkResult,
+  CompanyRecord,
+  DataSource,
+} from './data-source.interface.js';
 
 export class LiveDataSource implements DataSource {
   getCompany(_name: string): Promise<CompanyRecord | null> {

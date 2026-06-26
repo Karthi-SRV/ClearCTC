@@ -14,15 +14,24 @@ const validProfileResponse = {
 const companyDoc = {
   _id: 'c1',
   name: 'Acme',
-  ratings: [{ source: 'Glassdoor', wlb: 4, culture: 4, growth: 3.5, jobSecurity: 4 }],
-  reviews: [{ text: 'Good place', source: 'Glassdoor', date: '2024-06', sentiment: 'positive' }],
+  ratings: [
+    { source: 'Glassdoor', wlb: 4, culture: 4, growth: 3.5, jobSecurity: 4 },
+  ],
+  reviews: [
+    {
+      text: 'Good place',
+      source: 'Glassdoor',
+      date: '2024-06',
+      sentiment: 'positive',
+    },
+  ],
   aiProfile: null,
 };
 
 function makeService({
   companies = [] as object[],
-  aiResponse = validProfileResponse as object,
-  fetchResult = { aliases: [], roles: [], ratings: [], reviews: [] } as object,
+  aiResponse = validProfileResponse,
+  fetchResult = { aliases: [], roles: [], ratings: [], reviews: [] },
 }: {
   companies?: object[];
   aiResponse?: object;
@@ -47,7 +56,7 @@ function makeService({
 
   const service = new CompanyAiProfileService(
     companyModel as never,
-    ai as never,
+    ai,
     companyFetch as never,
   );
 
@@ -66,7 +75,9 @@ describe('CompanyAiProfileService', () => {
       expect(ai.call).toHaveBeenCalledTimes(1);
       expect(companyModel.updateOne).toHaveBeenCalledWith(
         { _id: 'c1' },
-        expect.objectContaining({ $set: expect.objectContaining({ aiProfile: expect.any(Object) }) }),
+        expect.objectContaining({
+          $set: expect.objectContaining({ aiProfile: expect.any(Object) }),
+        }),
       );
     });
 
@@ -100,7 +111,8 @@ describe('CompanyAiProfileService', () => {
         { ...companyDoc, _id: 'c2', name: 'Beta', aiProfile: null },
       ];
       const ai = {
-        call: jest.fn()
+        call: jest
+          .fn()
           .mockRejectedValueOnce(new Error('timeout'))
           .mockResolvedValueOnce(validProfileResponse),
       };
@@ -112,7 +124,11 @@ describe('CompanyAiProfileService', () => {
         }),
         updateOne: jest.fn().mockResolvedValue({}),
       };
-      const service = new CompanyAiProfileService(companyModel as never, ai as never, {} as never);
+      const service = new CompanyAiProfileService(
+        companyModel as never,
+        ai,
+        {} as never,
+      );
 
       const seedPromise = service.seedMissingProfiles();
       await jest.runAllTimersAsync();
@@ -129,9 +145,11 @@ describe('CompanyAiProfileService', () => {
         { ...companyDoc, _id: 'c2', name: 'B', aiProfile: null },
       ];
       const ai = {
-        call: jest.fn().mockRejectedValue(
-          new Error('[GEMINI_QUOTA_EXHAUSTED] Account quota exhausted'),
-        ),
+        call: jest
+          .fn()
+          .mockRejectedValue(
+            new Error('[GEMINI_QUOTA_EXHAUSTED] Account quota exhausted'),
+          ),
       };
       const companyModel = {
         find: jest.fn().mockReturnValue({
@@ -141,7 +159,11 @@ describe('CompanyAiProfileService', () => {
         }),
         updateOne: jest.fn().mockResolvedValue({}),
       };
-      const service = new CompanyAiProfileService(companyModel as never, ai as never, {} as never);
+      const service = new CompanyAiProfileService(
+        companyModel as never,
+        ai,
+        {} as never,
+      );
 
       // quota exhaustion doesn't need inter-call sleep (breaks immediately)
       await service.seedMissingProfiles();

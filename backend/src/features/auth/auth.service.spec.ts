@@ -24,7 +24,9 @@ const baseUserDoc = {
 describe('AuthService.signup', () => {
   it('creates a user and returns accessToken + user profile', async () => {
     const modelMock = {
-      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
+      findOne: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(null) }),
+      }),
       create: jest.fn().mockResolvedValue(baseUserDoc),
     };
     const jwtMock = { sign: jest.fn().mockReturnValue('jwt-token') };
@@ -51,8 +53,14 @@ describe('AuthService.signup', () => {
 
   it('zeroes variablePayLpa when isFixed is true', async () => {
     const modelMock = {
-      findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: () => Promise.resolve(null) }) }),
-      create: jest.fn().mockResolvedValue({ ...baseUserDoc, variablePayLpa: 0, isFixed: true }),
+      findOne: jest.fn().mockReturnValue({
+        lean: () => ({ exec: () => Promise.resolve(null) }),
+      }),
+      create: jest.fn().mockResolvedValue({
+        ...baseUserDoc,
+        variablePayLpa: 0,
+        isFixed: true,
+      }),
     };
     const jwtMock = { sign: jest.fn().mockReturnValue('t') };
     const service = makeService(modelMock, jwtMock);
@@ -77,22 +85,26 @@ describe('AuthService.signup', () => {
   it('throws ConflictException when email already exists', async () => {
     const modelMock = {
       findOne: jest.fn().mockReturnValue({
-        lean: () => ({ exec: () => Promise.resolve({ email: 'test@example.com' }) }),
+        lean: () => ({
+          exec: () => Promise.resolve({ email: 'test@example.com' }),
+        }),
       }),
     };
     const service = makeService(modelMock, {});
 
-    await expect(service.signup({
-      email: 'test@example.com',
-      password: 'pass',
-      currentCity: 'Bangalore',
-      basicPayLpa: 16,
-      variablePayLpa: 4,
-      currentCtcLpa: 20,
-      isFixed: false,
-      expectedHikePct: 20,
-      currentRole: 'SDE2',
-    })).rejects.toThrow(ConflictException);
+    await expect(
+      service.signup({
+        email: 'test@example.com',
+        password: 'pass',
+        currentCity: 'Bangalore',
+        basicPayLpa: 16,
+        variablePayLpa: 4,
+        currentCtcLpa: 20,
+        isFixed: false,
+        expectedHikePct: 20,
+        currentRole: 'SDE2',
+      }),
+    ).rejects.toThrow(ConflictException);
   });
 });
 
@@ -101,12 +113,17 @@ describe('AuthService.login', () => {
     const hash = await bcrypt.hash('correct-pass', 1);
     const userDoc = { ...baseUserDoc, passwordHash: hash };
     const modelMock = {
-      findOne: jest.fn().mockReturnValue({ exec: () => Promise.resolve(userDoc) }),
+      findOne: jest
+        .fn()
+        .mockReturnValue({ exec: () => Promise.resolve(userDoc) }),
     };
     const jwtMock = { sign: jest.fn().mockReturnValue('login-token') };
     const service = makeService(modelMock, jwtMock);
 
-    const result = await service.login({ email: 'test@example.com', password: 'correct-pass' });
+    const result = await service.login({
+      email: 'test@example.com',
+      password: 'correct-pass',
+    });
     expect(result.accessToken).toBe('login-token');
     expect(result.user.email).toBe('test@example.com');
   });
@@ -117,19 +134,23 @@ describe('AuthService.login', () => {
     };
     const service = makeService(modelMock, {});
 
-    await expect(service.login({ email: 'no@user.com', password: 'x' }))
-      .rejects.toThrow(UnauthorizedException);
+    await expect(
+      service.login({ email: 'no@user.com', password: 'x' }),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('throws UnauthorizedException when password is wrong', async () => {
     const hash = await bcrypt.hash('right', 1);
     const userDoc = { ...baseUserDoc, passwordHash: hash };
     const modelMock = {
-      findOne: jest.fn().mockReturnValue({ exec: () => Promise.resolve(userDoc) }),
+      findOne: jest
+        .fn()
+        .mockReturnValue({ exec: () => Promise.resolve(userDoc) }),
     };
     const service = makeService(modelMock, {});
 
-    await expect(service.login({ email: 'test@example.com', password: 'wrong' }))
-      .rejects.toThrow(UnauthorizedException);
+    await expect(
+      service.login({ email: 'test@example.com', password: 'wrong' }),
+    ).rejects.toThrow(UnauthorizedException);
   });
 });

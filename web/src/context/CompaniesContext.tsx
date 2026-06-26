@@ -35,9 +35,10 @@ async function fetchCompanies(apiFetch: ReturnType<typeof useApiFetch>): Promise
       try {
         const r = await apiFetch(COMPANIES);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const d = await r.json() as { companies: string[] };
-        _cache = d.companies;
-        return d.companies;
+        const d = await r.json() as { companies: any[] };
+        const names = d.companies.map((c) => (typeof c === 'string' ? c : c.name));
+        _cache = names;
+        return names;
       } catch (err) {
         _promise = null; // allow retry on next mount
         throw err;

@@ -19,10 +19,14 @@ export abstract class AiResponseParser {
       );
     }
 
-    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    if (
+      typeof parsed !== 'object' ||
+      parsed === null ||
+      Array.isArray(parsed)
+    ) {
       throw new AiParseError('AI response parsed but is not a JSON object');
     }
 
-    return parsed as object;
+    return parsed;
   }
 }

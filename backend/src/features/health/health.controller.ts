@@ -1,4 +1,10 @@
-import { Controller, Get, HttpException, HttpStatus, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Inject,
+} from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import type Redis from 'ioredis';
 import { Connection } from 'mongoose';

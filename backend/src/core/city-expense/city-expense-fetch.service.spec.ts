@@ -2,8 +2,13 @@ import { CityExpenseFetchService } from './city-expense-fetch.service.js';
 import { AiParseError } from '../ai/ai-parse.error.js';
 
 const MOCK_BREAKDOWN = {
-  rent: 25_000, groceries: 8_000, utilities: 3_000, transport: 5_000,
-  foodDining: 6_000, personalLifestyle: 4_000, miscellaneous: 3_000,
+  rent: 25_000,
+  groceries: 8_000,
+  utilities: 3_000,
+  transport: 5_000,
+  foodDining: 6_000,
+  personalLifestyle: 4_000,
+  miscellaneous: 3_000,
   total: 54_000, // 25000+8000+3000+5000+6000+4000+3000 = 54000
 };
 
@@ -19,7 +24,7 @@ const VALID_RESPONSE = {
 
 function makeFetchService() {
   const mockAi = { call: jest.fn() };
-  const svc = new CityExpenseFetchService(mockAi as any);
+  const svc = new CityExpenseFetchService(mockAi);
   return { svc, mockAi };
 }
 

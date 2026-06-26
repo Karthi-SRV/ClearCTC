@@ -1,9 +1,15 @@
 import { CityExpenseController } from './city-expense.controller.js';
 
-function makeController(getCityNames: string[] = [], getExpensesByFilter: object[] = []) {
+function makeController(
+  getCitiesWithIds: Array<{ _id: string; city: string }> = [],
+  getExpensesByFilter: object[] = [],
+  findOrCreateResult: any = { _id: '123', city: 'Bangalore' },
+) {
   const service = {
-    getCityNames: jest.fn().mockResolvedValue(getCityNames),
+    getCityNames: jest.fn().mockResolvedValue(getCitiesWithIds.map((c) => c.city)),
+    getCitiesWithIds: jest.fn().mockResolvedValue(getCitiesWithIds),
     getExpensesByFilter: jest.fn().mockResolvedValue(getExpensesByFilter),
+    findOrCreate: jest.fn().mockResolvedValue(findOrCreateResult),
   };
   return { ctrl: new CityExpenseController(service as never), service };
 }
@@ -23,7 +29,11 @@ const expenseDoc = {
 describe('CityExpenseController', () => {
   describe('getCities', () => {
     it('returns sorted city names from service', async () => {
-      const cities = ['Pune', 'Bangalore', 'Mumbai'];
+      const cities = [
+        { _id: '1', city: 'Pune' },
+        { _id: '2', city: 'Bangalore' },
+        { _id: '3', city: 'Mumbai' },
+      ];
       const { ctrl } = makeController(cities);
       const result = await ctrl.getCities();
       expect(result).toEqual({ cities });
@@ -52,13 +62,19 @@ describe('CityExpenseController', () => {
     it('passes an array of cities directly', async () => {
       const { ctrl, service } = makeController([], [expenseDoc]);
       await ctrl.getAll(['Bangalore', 'Pune']);
-      expect(service.getExpensesByFilter).toHaveBeenCalledWith(['Bangalore', 'Pune']);
+      expect(service.getExpensesByFilter).toHaveBeenCalledWith([
+        'Bangalore',
+        'Pune',
+      ]);
     });
 
     it('splits comma-separated cities in a single string', async () => {
       const { ctrl, service } = makeController([], [expenseDoc]);
       await ctrl.getAll('Bangalore,Pune');
-      expect(service.getExpensesByFilter).toHaveBeenCalledWith(['Bangalore', 'Pune']);
+      expect(service.getExpensesByFilter).toHaveBeenCalledWith([
+        'Bangalore',
+        'Pune',
+      ]);
     });
 
     it('maps returned docs to response shape', async () => {

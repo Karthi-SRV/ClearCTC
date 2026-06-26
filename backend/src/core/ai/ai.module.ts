@@ -35,7 +35,13 @@ import { OllamaAiClient } from './ollama-ai-client.js';
           `Unknown AI_PROVIDER "${provider}". Supported values: claude | gemini | ollama | google`,
         );
       },
-      inject: [ConfigService, ClaudeAiClient, GeminiAiClient, GoogleAiClient, OllamaAiClient],
+      inject: [
+        ConfigService,
+        ClaudeAiClient,
+        GeminiAiClient,
+        GoogleAiClient,
+        OllamaAiClient,
+      ],
     },
     // Domain-specific tokens — dynamic or hard-wired
     { provide: CITY_EXPENSE_AI_CLIENT, useExisting: AI_CLIENT },

@@ -19,7 +19,11 @@ describe('SalaryAskController', () => {
 
   describe('createSalaryAsk', () => {
     it('delegates to SalaryAskService.execute and returns its result', async () => {
-      const dto = { currentCity: 'Bangalore', currentCtcLpa: 20, expectedHikePct: 20 } as never;
+      const dto = {
+        currentCity: 'Bangalore',
+        currentCtcLpa: 20,
+        expectedHikePct: 20,
+      } as never;
       const expected = { cities: [] };
       salaryAskService.execute.mockResolvedValue(expected);
 

@@ -14,7 +14,7 @@ export const AUTH_SIGNUP = `${API_BASE}/auth/signup`;
 export const CITIES = `${API_BASE}/cities`;
 
 // Companies endpoint
-export const COMPANIES = `${API_BASE}/salary-comparisons/companies`;
+export const COMPANIES = `${API_BASE}/companies`;
 
 // City expenses endpoint
 export const CITY_EXPENSES = `${API_BASE}/city-expenses`;
@@ -25,3 +25,7 @@ export const SALARY_COMPARISONS = `${API_BASE}/salary-comparisons`;
 
 // Offer comparison endpoint
 export const OFFER_COMPARISONS = `${API_BASE}/offer-comparisons`;
+
+// Interview tracking endpoints
+export const INTERVIEWS = `${API_BASE}/interviews`;
+export const POSITIONS = `${API_BASE}/positions`;

@@ -56,9 +56,9 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, SALT_ROUNDS);
 
     // Ensure CTC = basic + variable (trust the client but also self-correct)
-    const basicPayLpa    = dto.basicPayLpa;
+    const basicPayLpa = dto.basicPayLpa;
     const variablePayLpa = dto.isFixed ? 0 : dto.variablePayLpa;
-    const currentCtcLpa  = Math.round((basicPayLpa + variablePayLpa) * 10) / 10;
+    const currentCtcLpa = Math.round((basicPayLpa + variablePayLpa) * 10) / 10;
 
     const created = await this.userModel.create({
       email: dto.email.toLowerCase(),

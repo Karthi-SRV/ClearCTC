@@ -28,7 +28,9 @@ export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name);
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const req = context.switchToHttp().getRequest<{ method: string; route?: { path: string }; url: string }>();
+    const req = context
+      .switchToHttp()
+      .getRequest<{ method: string; route?: { path: string }; url: string }>();
     const route = req.route?.path ?? req.url;
     const start = Date.now();
     const stopTimer = httpDuration.startTimer({ method: req.method, route });
@@ -46,7 +48,9 @@ export class LoggingInterceptor implements NestInterceptor {
         },
       }),
       finalize(() => {
-        const res = context.switchToHttp().getResponse<{ statusCode: number }>();
+        const res = context
+          .switchToHttp()
+          .getResponse<{ statusCode: number }>();
         const status = errorStatus ?? res.statusCode;
         const ms = Date.now() - start;
 

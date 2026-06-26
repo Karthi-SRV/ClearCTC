@@ -39,7 +39,9 @@ describe('SalaryAskRequestDto — three-field contract', () => {
       expectedIncrementPct: -5,
     });
     const errors = await validate(dto);
-    expect(errors.some((e) => e.property === 'expectedIncrementPct')).toBe(true);
+    expect(errors.some((e) => e.property === 'expectedIncrementPct')).toBe(
+      true,
+    );
   });
 
   it('does not define old experienceYears/targetRole/targetCompany fields', () => {

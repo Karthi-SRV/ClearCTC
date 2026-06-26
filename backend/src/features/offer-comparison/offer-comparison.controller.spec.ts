@@ -12,7 +12,7 @@ describe('OfferComparisonController', () => {
     const expected = { offers: [] };
     offerComparisonService.execute.mockResolvedValue(expected);
 
-    const result = await ctrl.createOfferComparison(user as never, dto);
+    const result = await ctrl.createOfferComparison(user, dto);
 
     expect(offerComparisonService.execute).toHaveBeenCalledWith('user-42', dto);
     expect(result).toBe(expected);
@@ -20,9 +20,13 @@ describe('OfferComparisonController', () => {
 
   it('passes offer count in log (smoke test — no throws)', async () => {
     const user = { sub: 'u1', email: 'x@y.com' };
-    const dto = { offers: [{ companyName: 'A' }, { companyName: 'B' }] } as never;
+    const dto = {
+      offers: [{ companyName: 'A' }, { companyName: 'B' }],
+    } as never;
     offerComparisonService.execute.mockResolvedValue({});
 
-    await expect(ctrl.createOfferComparison(user as never, dto)).resolves.toBeDefined();
+    await expect(
+      ctrl.createOfferComparison(user as never, dto),
+    ).resolves.toBeDefined();
   });
 });

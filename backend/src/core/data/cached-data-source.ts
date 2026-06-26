@@ -1,24 +1,34 @@
 import { Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Company, CompanyDocument } from '../../shared/schemas/company.schema.js';
-import { CityExpense, CityExpenseDocument } from '../../shared/schemas/city-expense.schema.js';
+import {
+  Company,
+  CompanyDocument,
+} from '../../shared/schemas/company.schema.js';
+import {
+  CityExpense,
+  CityExpenseDocument,
+} from '../../shared/schemas/city-expense.schema.js';
 import {
   BenchmarkResult,
   CompanyRecord,
   DataSource,
 } from './data-source.interface.js';
+import { escapeRegex } from '../../shared/utils/regex.util.js';
 
 export class CachedDataSource implements DataSource {
   constructor(
-    @InjectModel(Company.name) private readonly companyModel: Model<CompanyDocument>,
-    @InjectModel(CityExpense.name) private readonly cityExpenseModel: Model<CityExpenseDocument>,
+    @InjectModel(Company.name)
+    private readonly companyModel: Model<CompanyDocument>,
+    @InjectModel(CityExpense.name)
+    private readonly cityExpenseModel: Model<CityExpenseDocument>,
   ) {}
 
   async getCOLIndex(city: string): Promise<number | null> {
     if (!city) return null;
     const key = city.trim();
-    if (key.toLowerCase() === 'wfh' || key.toLowerCase() === 'remote') return null;
+    if (key.toLowerCase() === 'wfh' || key.toLowerCase() === 'remote')
+      return null;
     const doc = await this.cityExpenseModel
       .findOne({ city: new RegExp(`^${escapeRegex(key)}$`, 'i') })
       .select('colIndex')
@@ -40,7 +50,7 @@ export class CachedDataSource implements DataSource {
 
     return {
       name: doc.name,
-      ratings: (doc.ratings ?? []) as CompanyRecord['ratings'],
+      ratings: doc.ratings ?? [],
       reviews: (doc.reviews ?? []) as CompanyRecord['reviews'],
       dataAsOf: doc.dataAsOf,
       aiProfile: (doc.aiProfile ?? null) as CompanyRecord['aiProfile'],
@@ -88,8 +98,4 @@ export class CachedDataSource implements DataSource {
       .exec();
     return docs.map((d) => d.name);
   }
-}
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

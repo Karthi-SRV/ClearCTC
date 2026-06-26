@@ -21,7 +21,9 @@ export class OfferComparisonController {
     @CurrentUser() user: AuthPayload,
     @Body() dto: CreateOfferComparisonDto,
   ) {
-    this.logger.log(`POST /api/v1/offer-comparisons | userId: ${user.sub} | offerCount: ${dto.offers?.length || 0}`);
+    this.logger.log(
+      `POST /api/v1/offer-comparisons | userId: ${user.sub} | offerCount: ${dto.offers?.length || 0}`,
+    );
     return this.offerComparison.execute(user.sub, dto);
   }
 }

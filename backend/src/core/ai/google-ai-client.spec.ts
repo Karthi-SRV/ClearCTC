@@ -67,21 +67,29 @@ describe('GoogleAiClient.call — success path', () => {
 describe('GoogleAiClient.call — error paths', () => {
   it('network error → throws AiParseError', async () => {
     mockGenerateContent.mockRejectedValue(new Error('ECONNREFUSED'));
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 
   it('empty candidates → throws AiParseError (empty string fails JSON parse)', async () => {
     mockGenerateContent.mockResolvedValue({ response: { candidates: [] } });
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 
   it('non-JSON text → throws AiParseError', async () => {
     vertexOk('Sorry, I cannot help with that.');
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 
   it('JSON array response → throws AiParseError', async () => {
     vertexOk('[1, 2, 3]');
-    await expect(makeClient().call('sys', 'user')).rejects.toThrow(AiParseError);
+    await expect(makeClient().call('sys', 'user')).rejects.toThrow(
+      AiParseError,
+    );
   });
 });

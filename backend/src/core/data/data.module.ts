@@ -5,7 +5,10 @@ import { CachedDataSource } from './cached-data-source.js';
 import { CompanyAiProfileService } from './company-ai-profile.service.js';
 import { CompanyFetchService } from './company-fetch.service.js';
 import { Company, CompanySchema } from '../../shared/schemas/company.schema.js';
-import { CityExpense, CityExpenseSchema } from '../../shared/schemas/city-expense.schema.js';
+import {
+  CityExpense,
+  CityExpenseSchema,
+} from '../../shared/schemas/city-expense.schema.js';
 import { DATA_SOURCE } from './data-source.interface.js';
 import { LiveDataSource } from './live-data-source.js';
 import { AiModule } from '../ai/ai.module.js';

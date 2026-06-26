@@ -45,7 +45,9 @@ async function waitForPort(port: number, maxWaitMs = 8000): Promise<void> {
     await new Promise((r) => setTimeout(r, delay));
     delay = Math.min(delay * 2, 1000);
   }
-  console.error(`[bootstrap] Port ${port} still busy after ${maxWaitMs / 1000}s. Exiting.`);
+  console.error(
+    `[bootstrap] Port ${port} still busy after ${maxWaitMs / 1000}s. Exiting.`,
+  );
   process.exit(1);
 }
 
@@ -57,15 +59,21 @@ function killPortListeners(port: number): void {
   if (process.env.NODE_ENV === 'production') return;
   if (process.platform !== 'darwin' && process.platform !== 'linux') return;
   try {
-    const stdout = execSync(`lsof -t -i:${port} -sTCP:LISTEN`, { encoding: 'utf8' });
+    const stdout = execSync(`lsof -t -i:${port} -sTCP:LISTEN`, {
+      encoding: 'utf8',
+    });
     const pids = stdout
       .split('\n')
       .map((p) => p.trim())
       .filter((p) => p && Number(p) !== process.pid);
     if (pids.length > 0) {
-      console.log(`[bootstrap] Killing stale listener(s) on port ${port}: PID ${pids.join(', ')}`);
+      console.log(
+        `[bootstrap] Killing stale listener(s) on port ${port}: PID ${pids.join(', ')}`,
+      );
       for (const pid of pids) {
-        try { execSync(`kill -9 ${pid}`); } catch {}
+        try {
+          execSync(`kill -9 ${pid}`);
+        } catch {}
       }
     }
   } catch {
@@ -79,7 +87,9 @@ function killPortListeners(port: number): void {
  * We call closeAllConnections() first so the OS can reclaim the socket faster.
  */
 function forceExit(server: net.Server, signal: string): void {
-  console.log(`[bootstrap] Received ${signal}. Exiting to free port ${process.env.PORT ?? 3000}...`);
+  console.log(
+    `[bootstrap] Received ${signal}. Exiting to free port ${process.env.PORT ?? 3000}...`,
+  );
   try {
     if (typeof (server as any).closeAllConnections === 'function') {
       (server as any).closeAllConnections();
@@ -114,8 +124,8 @@ async function bootstrap() {
 
   process.on('exit', () => {
     try {
-      if (typeof (server as any).closeAllConnections === 'function') {
-        (server as any).closeAllConnections();
+      if (typeof server.closeAllConnections === 'function') {
+        server.closeAllConnections();
       }
       server.close();
     } catch {}
@@ -138,7 +148,11 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
   app.useGlobalFilters(new AiExceptionFilter());
 

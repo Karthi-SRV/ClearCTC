@@ -33,64 +33,94 @@ export class SalaryComparisonService {
     dto: QuickSalaryComparisonDto,
   ): Promise<QuickSalaryComparisonResponseDto> {
     try {
-      this.logger.log(`[execute] START | userId: ${userId} | offers: ${dto.offers?.length || 0}`);
+      this.logger.log(
+        `[execute] START | userId: ${userId} | offers: ${dto.offers?.length || 0}`,
+      );
 
       const user = await this.userModel.findById(userId).lean().exec();
       if (!user) throw new NotFoundException('User not found');
 
-      this.logger.debug(`[execute] User loaded | currentCity: ${user.currentCity}`);
+      this.logger.debug(
+        `[execute] User loaded | currentCity: ${user.currentCity}`,
+      );
 
       const familyType = dto.familyType ?? 'family';
-      const memberCount = familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
+      const memberCount =
+        familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
 
       // 1. Fetch city expenses + COL index for each offer (in parallel)
-      this.logger.debug(`[execute] Fetching city expenses and COL indices for ${dto.offers.length} offers`);
+      this.logger.debug(
+        `[execute] Fetching city expenses and COL indices for ${dto.offers.length} offers`,
+      );
       const enriched = await Promise.all(
         dto.offers.map(async (raw: SalaryComparisonOfferDto) => {
           const expenseCity = raw.isWfh ? user.currentCity : raw.targetCity;
-          this.logger.debug(`[execute] Fetching data for ${raw.companyName} | city: ${expenseCity} | isWfh: ${raw.isWfh}`);
+          this.logger.debug(
+            `[execute] Fetching data for ${raw.companyName} | city: ${expenseCity} | isWfh: ${raw.isWfh}`,
+          );
 
           const [expenseDoc, colIndex] = await Promise.all([
-            this.cityExpenseService.getExpenseBreakdown(expenseCity, familyType, memberCount),
+            this.cityExpenseService.getExpenseBreakdown(
+              expenseCity,
+              familyType,
+              memberCount,
+            ),
             this.data.getCOLIndex(expenseCity),
           ]);
 
-          this.logger.debug(`[execute] Data fetched | ${raw.companyName} | colIndex: ${colIndex} | totalExpense: ${expenseDoc.breakdown.total}`);
-          return { raw, expenseBreakdown: expenseDoc.breakdown, colIndexUsed: colIndex ?? 1.0 };
+          this.logger.debug(
+            `[execute] Data fetched | ${raw.companyName} | colIndex: ${colIndex} | totalExpense: ${expenseDoc.breakdown.total}`,
+          );
+          return {
+            raw,
+            expenseBreakdown: expenseDoc.breakdown,
+            colIndexUsed: colIndex ?? 1.0,
+          };
         }),
       );
 
       // 2. Compute snapshots (deterministic, no AI)
-      this.logger.debug(`[execute] Computing offer snapshots for ${enriched.length} offers`);
-      const snapshots: QuickOfferSnapshotDto[] = enriched.map(({ raw, expenseBreakdown, colIndexUsed }) =>
-        this.comp.computeOfferSnapshot(
-          {
-            companyName: raw.companyName,
-            totalCtcLpa: raw.totalCtcLpa,
-            variablePct: raw.variablePct,
-            variableGuaranteed: raw.variableGuaranteed,
-            joiningBonusLpa: raw.joiningBonusLpa,
-            employerPf: raw.employerPf,
-            targetCity: raw.targetCity,
-            isWfh: raw.isWfh,
-          },
-          expenseBreakdown,
-          colIndexUsed,
-        ),
+      this.logger.debug(
+        `[execute] Computing offer snapshots for ${enriched.length} offers`,
+      );
+      const snapshots: QuickOfferSnapshotDto[] = enriched.map(
+        ({ raw, expenseBreakdown, colIndexUsed }) =>
+          this.comp.computeOfferSnapshot(
+            {
+              companyName: raw.companyName,
+              totalCtcLpa: raw.totalCtcLpa,
+              variablePct: raw.variablePct,
+              variableGuaranteed: raw.variableGuaranteed,
+              joiningBonusLpa: raw.joiningBonusLpa,
+              employerPf: raw.employerPf,
+              targetCity: raw.targetCity,
+              isWfh: raw.isWfh,
+            },
+            expenseBreakdown,
+            colIndexUsed,
+          ),
       );
 
       snapshots.forEach((snap) => {
-        this.logger.debug(`[execute] Snapshot computed | ${snap.companyName} | ctc: ${snap.totalCtcLpa} | inHand/mo: ${snap.monthlyInHand.toFixed(2)}`);
+        this.logger.debug(
+          `[execute] Snapshot computed | ${snap.companyName} | ctc: ${snap.totalCtcLpa} | inHand/mo: ${snap.monthlyInHand.toFixed(2)}`,
+        );
       });
 
       // 3. Fetch company details from the database
-      this.logger.debug(`[execute] Fetching company details for ${dto.offers.length} offers`);
+      this.logger.debug(
+        `[execute] Fetching company details for ${dto.offers.length} offers`,
+      );
       const companyRecords = await Promise.all(
-        dto.offers.map((raw: SalaryComparisonOfferDto) => this.data.getCompany(raw.companyName)),
+        dto.offers.map((raw: SalaryComparisonOfferDto) =>
+          this.data.getCompany(raw.companyName),
+        ),
       );
 
       const companiesFound = companyRecords.filter((c) => c !== null).length;
-      this.logger.debug(`[execute] Company records fetched | found: ${companiesFound}/${companyRecords.length}`);
+      this.logger.debug(
+        `[execute] Company records fetched | found: ${companiesFound}/${companyRecords.length}`,
+      );
 
       // 4. Build company details response
       const companyDetails: CompanyDetailsDto[] = snapshots.map((snap, i) => {
@@ -117,7 +147,13 @@ export class SalaryComparisonService {
         // Use first rating source
         const primaryRating = rec.ratings?.[0];
         const overall = primaryRating
-          ? +((primaryRating.wlb + primaryRating.culture + primaryRating.growth + primaryRating.jobSecurity) / 4).toFixed(1)
+          ? +(
+              (primaryRating.wlb +
+                primaryRating.culture +
+                primaryRating.growth +
+                primaryRating.jobSecurity) /
+              4
+            ).toFixed(1)
           : 0;
 
         return {
@@ -140,7 +176,9 @@ export class SalaryComparisonService {
         };
       });
 
-      this.logger.log(`[execute] COMPLETE | userId: ${userId} | offers: ${snapshots.length}`);
+      this.logger.log(
+        `[execute] COMPLETE | userId: ${userId} | offers: ${snapshots.length}`,
+      );
 
       return {
         userId,
@@ -150,7 +188,9 @@ export class SalaryComparisonService {
         disclaimer: DATA_DISCLAIMER,
       };
     } catch (err) {
-      this.logger.error(`[execute] FAILED | userId: ${userId} | error: ${(err as Error).message}`);
+      this.logger.error(
+        `[execute] FAILED | userId: ${userId} | error: ${(err as Error).message}`,
+      );
       throw err;
     }
   }

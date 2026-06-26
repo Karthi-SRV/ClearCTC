@@ -3,8 +3,14 @@ import type { CityExpense } from '../../shared/schemas/city-expense.schema.js';
 
 function makeDoc(city: string): CityExpense {
   const breakdown = {
-    rent: 25_000, groceries: 8_000, utilities: 3_000, transport: 5_000,
-    foodDining: 6_000, personalLifestyle: 4_000, miscellaneous: 3_000, total: 54_000,
+    rent: 25_000,
+    groceries: 8_000,
+    utilities: 3_000,
+    transport: 5_000,
+    foodDining: 6_000,
+    personalLifestyle: 4_000,
+    miscellaneous: 3_000,
+    total: 54_000,
   };
   return {
     city,

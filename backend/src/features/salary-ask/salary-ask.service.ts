@@ -13,18 +13,44 @@ import {
 
 const STANDARD_CITIES = [
   // Metro
-  'Kolkata', 'Chennai', 'Hyderabad', 'Pune', 'Bangalore', 'Mumbai',
-  'Delhi NCR', 'Noida', 'Gurgaon',
+  'Kolkata',
+  'Chennai',
+  'Hyderabad',
+  'Pune',
+  'Bangalore',
+  'Mumbai',
+  'Delhi NCR',
+  'Noida',
+  'Gurgaon',
   // South
-  'Coimbatore', 'Madurai', 'Kochi', 'Thiruvananthapuram', 'Mysore',
-  'Mangalore', 'Visakhapatnam', 'Trichy',
+  'Coimbatore',
+  'Madurai',
+  'Kochi',
+  'Thiruvananthapuram',
+  'Mysore',
+  'Mangalore',
+  'Visakhapatnam',
+  'Trichy',
   // West & Central
-  'Ahmedabad', 'Surat', 'Vadodara', 'Nashik', 'Nagpur', 'Indore',
+  'Ahmedabad',
+  'Surat',
+  'Vadodara',
+  'Nashik',
+  'Nagpur',
+  'Indore',
   // North
-  'Jaipur', 'Lucknow', 'Chandigarh', 'Mohali', 'Amritsar', 'Ludhiana',
+  'Jaipur',
+  'Lucknow',
+  'Chandigarh',
+  'Mohali',
+  'Amritsar',
+  'Ludhiana',
   'Dehradun',
   // East
-  'Bhubaneswar', 'Patna', 'Ranchi', 'Guwahati',
+  'Bhubaneswar',
+  'Patna',
+  'Ranchi',
+  'Guwahati',
 ];
 
 const FRESH_THRESHOLD_MS = 30 * 24 * 3600 * 1000;
@@ -34,25 +60,59 @@ const CHENNAI_COL_FALLBACK = 1.0;
 // Fallback monthly totals (INR) represent a family-of-4 baseline.
 // Used when CityExpenseService is unavailable.
 const FALLBACK_EXPENSES_FAMILY4: Record<string, number> = {
-  kolkata: 46_500, chennai: 58_000, hyderabad: 60_000, pune: 72_000,
-  bangalore: 82_000, mumbai: 105_000, 'delhi ncr': 78_000,
-  noida: 72_000, gurgaon: 76_000,
-  coimbatore: 52_000, madurai: 48_000, kochi: 62_000,
-  thiruvananthapuram: 56_000, mysore: 54_000, mangalore: 52_000,
-  visakhapatnam: 54_000, trichy: 46_000,
-  ahmedabad: 56_000, surat: 52_000, vadodara: 50_000,
-  nashik: 52_000, nagpur: 52_000, indore: 50_000,
-  jaipur: 52_000, lucknow: 50_000, chandigarh: 60_000,
-  mohali: 58_000, amritsar: 50_000, ludhiana: 52_000, dehradun: 52_000,
-  bhubaneswar: 52_000, patna: 48_000, ranchi: 46_000, guwahati: 48_000,
+  kolkata: 46_500,
+  chennai: 58_000,
+  hyderabad: 60_000,
+  pune: 72_000,
+  bangalore: 82_000,
+  mumbai: 105_000,
+  'delhi ncr': 78_000,
+  noida: 72_000,
+  gurgaon: 76_000,
+  coimbatore: 52_000,
+  madurai: 48_000,
+  kochi: 62_000,
+  thiruvananthapuram: 56_000,
+  mysore: 54_000,
+  mangalore: 52_000,
+  visakhapatnam: 54_000,
+  trichy: 46_000,
+  ahmedabad: 56_000,
+  surat: 52_000,
+  vadodara: 50_000,
+  nashik: 52_000,
+  nagpur: 52_000,
+  indore: 50_000,
+  jaipur: 52_000,
+  lucknow: 50_000,
+  chandigarh: 60_000,
+  mohali: 58_000,
+  amritsar: 50_000,
+  ludhiana: 52_000,
+  dehradun: 52_000,
+  bhubaneswar: 52_000,
+  patna: 48_000,
+  ranchi: 46_000,
+  guwahati: 48_000,
 };
 
 // Scale a family-4 base amount for other family sizes / individual
-const FAMILY_SCALE: Record<number, number> = { 1: 0.40, 2: 0.60, 3: 0.78, 4: 1.00, 5: 1.18, 6: 1.33 };
+const FAMILY_SCALE: Record<number, number> = {
+  1: 0.4,
+  2: 0.6,
+  3: 0.78,
+  4: 1.0,
+  5: 1.18,
+  6: 1.33,
+};
 
-function scaleFallback(base: number, familyType: FamilyType, memberCount: number): number {
+function scaleFallback(
+  base: number,
+  familyType: FamilyType,
+  memberCount: number,
+): number {
   const effectiveMember = familyType === 'individual' ? 1 : memberCount;
-  return Math.round(base * (FAMILY_SCALE[effectiveMember] ?? 1.00));
+  return Math.round(base * (FAMILY_SCALE[effectiveMember] ?? 1.0));
 }
 
 interface CachedResponse {
@@ -70,7 +130,7 @@ function assignBadge(
   const ratio = equivCtcLpa / currentCtcLpa;
   if (ratio < 0.95) return 'cheaper';
   if (ratio <= 1.07) return 'similar';
-  if (ratio <= 1.20) return 'moderate';
+  if (ratio <= 1.2) return 'moderate';
   if (ratio <= 1.35) return 'premium';
   return 'high-cost';
 }
@@ -91,13 +151,15 @@ export class SalaryAskService {
 
   private cacheKey(dto: SalaryAskRequestDto): string {
     const familyType = dto.familyType ?? 'family';
-    const memberCount = familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
+    const memberCount =
+      familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
     return `${dto.currentCity.trim().toLowerCase()}|${dto.currentCtcLpa}|${dto.expectedIncrementPct}|${familyType}|${memberCount}`;
   }
 
   async execute(dto: SalaryAskRequestDto): Promise<SalaryAskResponseDto> {
     const familyType: FamilyType = dto.familyType ?? 'family';
-    const memberCount = familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
+    const memberCount =
+      familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
 
     const key = this.cacheKey(dto);
     const hit = this.responseCache.get(key);
@@ -106,7 +168,9 @@ export class SalaryAskService {
     }
 
     const hikedCtcLpa =
-      Math.round(dto.currentCtcLpa * (1 + dto.expectedIncrementPct / 100) * 10) / 10;
+      Math.round(
+        dto.currentCtcLpa * (1 + dto.expectedIncrementPct / 100) * 10,
+      ) / 10;
 
     const colPromises = await Promise.all([
       this.data.getCOLIndex(dto.currentCity),
@@ -124,49 +188,65 @@ export class SalaryAskService {
     const baseColIdx = currentCityCol ?? CHENNAI_COL_FALLBACK;
 
     const expenseResults = await Promise.allSettled(
-      STANDARD_CITIES.map((c) => this.cityExpense.getExpenseBreakdown(c, familyType, memberCount)),
+      STANDARD_CITIES.map((c) =>
+        this.cityExpense.getExpenseBreakdown(c, familyType, memberCount),
+      ),
     );
 
-    const cityComparisons: CityComparisonDto[] = STANDARD_CITIES.map((city, i) => {
-      const colIdx = colIndices[city] ?? baseColIdx;
-      const equivCtcLpa = Math.round((dto.currentCtcLpa * colIdx) / baseColIdx * 10) / 10;
-      const monthlyInHandDerived = this.comp.computeMonthlyInHandFromLpa(equivCtcLpa);
+    const cityComparisons: CityComparisonDto[] = STANDARD_CITIES.map(
+      (city, i) => {
+        const colIdx = colIndices[city] ?? baseColIdx;
+        const equivCtcLpa =
+          Math.round(((dto.currentCtcLpa * colIdx) / baseColIdx) * 10) / 10;
+        const monthlyInHandDerived =
+          this.comp.computeMonthlyInHandFromLpa(equivCtcLpa);
 
-      const expRes = expenseResults[i];
-      const expDoc = expRes.status === 'fulfilled' ? expRes.value : null;
-      const fallbackBase = FALLBACK_EXPENSES_FAMILY4[city.toLowerCase()] ?? 60_000;
-      const monthlyExpenses = expDoc?.breakdown.total ?? scaleFallback(fallbackBase, familyType, memberCount);
+        const expRes = expenseResults[i];
+        const expDoc = expRes.status === 'fulfilled' ? expRes.value : null;
+        const fallbackBase =
+          FALLBACK_EXPENSES_FAMILY4[city.toLowerCase()] ?? 60_000;
+        const monthlyExpenses =
+          expDoc?.breakdown.total ??
+          scaleFallback(fallbackBase, familyType, memberCount);
 
-      const expenseBreakdown: ExpenseBreakdownDto | null = expDoc
-        ? {
-            rent: expDoc.breakdown.rent,
-            groceries: expDoc.breakdown.groceries,
-            utilities: expDoc.breakdown.utilities,
-            transport: expDoc.breakdown.transport,
-            foodDining: expDoc.breakdown.foodDining,
-            personalLifestyle: expDoc.breakdown.personalLifestyle,
-            miscellaneous: expDoc.breakdown.miscellaneous,
-            total: expDoc.breakdown.total,
-            disclaimer: expDoc.disclaimer,
-            generatedAt: expDoc.generatedAt.toISOString(),
-          }
-        : null;
+        const expenseBreakdown: ExpenseBreakdownDto | null = expDoc
+          ? {
+              rent: expDoc.breakdown.rent,
+              groceries: expDoc.breakdown.groceries,
+              utilities: expDoc.breakdown.utilities,
+              transport: expDoc.breakdown.transport,
+              foodDining: expDoc.breakdown.foodDining,
+              personalLifestyle: expDoc.breakdown.personalLifestyle,
+              miscellaneous: expDoc.breakdown.miscellaneous,
+              total: expDoc.breakdown.total,
+              disclaimer: expDoc.disclaimer,
+              generatedAt: expDoc.generatedAt.toISOString(),
+            }
+          : null;
 
-      return {
-        city,
-        badge: assignBadge(equivCtcLpa, dto.currentCtcLpa, city, dto.currentCity),
-        colIndex: colIdx,
-        equivCtcLpa,
-        equivCtcRangeLow: Math.round(equivCtcLpa * 0.95 * 10) / 10,
-        equivCtcRangeHigh: Math.round(equivCtcLpa * 1.05 * 10) / 10,
-        monthlyInHand: monthlyInHandDerived,
-        monthlyExpenses,
-        monthlySavings: monthlyInHandDerived - monthlyExpenses,
-        expenseBreakdown,
-      };
-    });
+        return {
+          city,
+          badge: assignBadge(
+            equivCtcLpa,
+            dto.currentCtcLpa,
+            city,
+            dto.currentCity,
+          ),
+          colIndex: colIdx,
+          equivCtcLpa,
+          equivCtcRangeLow: Math.round(equivCtcLpa * 0.95 * 10) / 10,
+          equivCtcRangeHigh: Math.round(equivCtcLpa * 1.05 * 10) / 10,
+          monthlyInHand: monthlyInHandDerived,
+          monthlyExpenses,
+          monthlySavings: monthlyInHandDerived - monthlyExpenses,
+          expenseBreakdown,
+        };
+      },
+    );
 
-    const anyExpenseFailed = expenseResults.some((r) => r.status === 'rejected');
+    const anyExpenseFailed = expenseResults.some(
+      (r) => r.status === 'rejected',
+    );
     const anyExpenseStale = expenseResults.some((r) => {
       if (r.status !== 'fulfilled') return false;
       return Date.now() - r.value.generatedAt.getTime() > FRESH_THRESHOLD_MS;
@@ -212,7 +292,10 @@ export class SalaryAskService {
       dataAsOf: new Date().toISOString().slice(0, 10),
     };
 
-    this.responseCache.set(key, { data: result, expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS });
+    this.responseCache.set(key, {
+      data: result,
+      expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
+    });
     return result;
   }
 }

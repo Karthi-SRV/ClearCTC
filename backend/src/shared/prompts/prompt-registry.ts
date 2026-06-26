@@ -127,7 +127,7 @@ RULES:
 export const CITY_EXPENSE_SYSTEM_PROMPT =
   'You are a cost-of-living research assistant for Indian cities. Return ONLY valid JSON — no markdown, no extra text.\n' +
   'The JSON must have exactly these keys: individual, family, family3, family4, family5, family6.\n' +
-  'Each key\'s value must be an expense breakdown object with these integer fields (positive INR per month):\n' +
+  "Each key's value must be an expense breakdown object with these integer fields (positive INR per month):\n" +
   'rent, groceries, utilities, transport, foodDining, personalLifestyle, miscellaneous, total.\n' +
   'For each breakdown, the total field MUST equal the exact arithmetic sum of all other fields.\n' +
   'Include a top-level non-empty disclaimer string.';

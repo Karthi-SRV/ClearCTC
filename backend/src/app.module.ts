@@ -10,6 +10,9 @@ import { SalaryComparisonModule } from './features/salary-comparison/salary-comp
 import { HealthModule } from './features/health/health.module.js';
 import { CityExpenseAdminModule } from './features/city-expense/city-expense-admin.module.js';
 import { AuthModule } from './features/auth/auth.module.js';
+import { CompanyModule } from './features/company/company.module.js';
+import { PositionModule } from './features/position/position.module.js';
+import { InterviewModule } from './features/interview/interview.module.js';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor.js';
 import { LoggerModule } from './core/logger/logger.module.js';
 
@@ -23,9 +26,7 @@ import { LoggerModule } from './core/logger/logger.module.js';
       inject: [ConfigService],
     }),
     // Named throttler for AI endpoints. Limit enforced per userId via AiThrottlerGuard.
-    ThrottlerModule.forRoot([
-      { name: 'ai', ttl: 60_000, limit: 3 },
-    ]),
+    ThrottlerModule.forRoot([{ name: 'ai', ttl: 60_000, limit: 3 }]),
     LoggerModule,
     AuthModule,
     SalaryAskModule,
@@ -33,9 +34,12 @@ import { LoggerModule } from './core/logger/logger.module.js';
     SalaryComparisonModule,
     HealthModule,
     CityExpenseAdminModule,
+    CompanyModule,
+    PositionModule,
+    InterviewModule,
   ],
   providers: [
-    { provide: APP_GUARD,       useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
   ],
 })

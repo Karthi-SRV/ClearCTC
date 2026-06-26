@@ -21,6 +21,6 @@ export class OffersService {
       ...o,
       userId: new Types.ObjectId(o.userId),
     }));
-    return this.offerModel.insertMany(docs) as unknown as Promise<OfferDocument[]>;
+    return this.offerModel.insertMany(docs);
   }
 }

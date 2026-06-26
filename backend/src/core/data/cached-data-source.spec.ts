@@ -20,8 +20,20 @@ const SEED_COMPANY = {
     },
   ],
   ratings: [
-    { source: 'ambitionbox', wlb: 3.8, culture: 3.6, growth: 3.5, jobSecurity: 4.0 },
-    { source: 'glassdoor', wlb: 3.2, culture: 3.5, growth: 3.3, jobSecurity: 3.8 },
+    {
+      source: 'ambitionbox',
+      wlb: 3.8,
+      culture: 3.6,
+      growth: 3.5,
+      jobSecurity: 4.0,
+    },
+    {
+      source: 'glassdoor',
+      wlb: 3.2,
+      culture: 3.5,
+      growth: 3.3,
+      jobSecurity: 3.8,
+    },
   ],
   reviews: [],
   dataAsOf: new Date('2025-01-01'),
@@ -47,22 +59,34 @@ function makeMockCityExpenseModel(colIndex: number | null) {
 
 describe('CachedDataSource.getCOLIndex', () => {
   it('"Bangalore" → 1.19', async () => {
-    const ds = new CachedDataSource(makeMockModel(null), makeMockCityExpenseModel(1.19));
+    const ds = new CachedDataSource(
+      makeMockModel(null),
+      makeMockCityExpenseModel(1.19),
+    );
     expect(await ds.getCOLIndex('Bangalore')).toBe(1.19);
   });
 
   it('"Mumbai" → 1.39', async () => {
-    const ds = new CachedDataSource(makeMockModel(null), makeMockCityExpenseModel(1.39));
+    const ds = new CachedDataSource(
+      makeMockModel(null),
+      makeMockCityExpenseModel(1.39),
+    );
     expect(await ds.getCOLIndex('Mumbai')).toBe(1.39);
   });
 
   it('unknown city → null', async () => {
-    const ds = new CachedDataSource(makeMockModel(null), makeMockCityExpenseModel(null));
+    const ds = new CachedDataSource(
+      makeMockModel(null),
+      makeMockCityExpenseModel(null),
+    );
     expect(await ds.getCOLIndex('Atlantis')).toBeNull();
   });
 
   it('"WFH" → null', async () => {
-    const ds = new CachedDataSource(makeMockModel(null), makeMockCityExpenseModel(null));
+    const ds = new CachedDataSource(
+      makeMockModel(null),
+      makeMockCityExpenseModel(null),
+    );
     expect(await ds.getCOLIndex('WFH')).toBeNull();
   });
 });

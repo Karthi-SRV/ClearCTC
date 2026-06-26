@@ -63,17 +63,27 @@ describe('CompensationService', () => {
 
   // Shared fixtures
   const baseExpense: ExpenseBreakdownItem = {
-    rent: 25_000, groceries: 8_000, utilities: 5_000, transport: 5_000,
-    foodDining: 8_000, personalLifestyle: 5_000,
-    miscellaneous: 9_000, total: 65_000,
+    rent: 25_000,
+    groceries: 8_000,
+    utilities: 5_000,
+    transport: 5_000,
+    foodDining: 8_000,
+    personalLifestyle: 5_000,
+    miscellaneous: 9_000,
+    total: 65_000,
   };
 
   const profileExpense: ExpenseBreakdownItem = {
-    ...baseExpense, total: 50_000, rent: 20_000, miscellaneous: 7_000,
+    ...baseExpense,
+    total: 50_000,
+    rent: 20_000,
+    miscellaneous: 7_000,
   };
 
   const targetExpense: ExpenseBreakdownItem = {
-    ...baseExpense, total: 70_000, rent: 35_000,
+    ...baseExpense,
+    total: 70_000,
+    rent: 35_000,
   };
 
   function makeInput(overrides: Partial<OfferInput> = {}): OfferInput {
@@ -122,7 +132,9 @@ describe('CompensationService', () => {
 
     it('effectiveCtcAnnual equals fixedPayAnnual + variableAnnual', () => {
       const snap = svc.computeOfferSnapshot(input, baseExpense, 100);
-      expect(snap.effectiveCtcAnnual).toBe(snap.fixedPayAnnual + snap.variableAnnual);
+      expect(snap.effectiveCtcAnnual).toBe(
+        snap.fixedPayAnnual + snap.variableAnnual,
+      );
     });
 
     it('taxableIncome is based on full effective CTC', () => {
@@ -132,18 +144,26 @@ describe('CompensationService', () => {
     });
 
     it('guaranteed variant has higher inHand than at-risk', () => {
-      const atRisk     = svc.computeOfferSnapshot(makeInput({ variablePct: 20, variableGuaranteed: false }), baseExpense, 100);
+      const atRisk = svc.computeOfferSnapshot(
+        makeInput({ variablePct: 20, variableGuaranteed: false }),
+        baseExpense,
+        100,
+      );
       const guaranteed = svc.computeOfferSnapshot(input, baseExpense, 100);
       expect(guaranteed.monthlyInHand).toBeGreaterThan(atRisk.monthlyInHand);
     });
   });
 
   describe('Case 4 — joining bonus present', () => {
-    const input = makeInput({ joiningBonusLpa: 1 });  // ₹1L joining bonus
+    const input = makeInput({ joiningBonusLpa: 1 }); // ₹1L joining bonus
 
     it('joiningBonus excluded from basicAnnual derivation', () => {
-      const withBonus    = svc.computeOfferSnapshot(input, baseExpense, 100);
-      const withoutBonus = svc.computeOfferSnapshot(makeInput(), baseExpense, 100);
+      const withBonus = svc.computeOfferSnapshot(input, baseExpense, 100);
+      const withoutBonus = svc.computeOfferSnapshot(
+        makeInput(),
+        baseExpense,
+        100,
+      );
       // With joining bonus, basicAnnual must be lower because the bonus is excluded from the base
       expect(withBonus.basicAnnual).toBeLessThan(withoutBonus.basicAnnual);
     });
@@ -163,7 +183,7 @@ describe('CompensationService', () => {
 
   describe('Case 5 — employerPf=none', () => {
     const noPf = makeInput({ employerPf: 'none' });
-    const stat  = makeInput({ employerPf: 'statutory' });
+    const stat = makeInput({ employerPf: 'statutory' });
 
     it('employerPfAnnual is 0', () => {
       const snap = svc.computeOfferSnapshot(noPf, baseExpense, 100);
@@ -187,35 +207,42 @@ describe('CompensationService', () => {
     });
 
     it('isWfh is echoed on the snapshot', () => {
-      const snap = svc.computeOfferSnapshot(makeInput({ isWfh: true }), profileExpense, 100);
+      const snap = svc.computeOfferSnapshot(
+        makeInput({ isWfh: true }),
+        profileExpense,
+        100,
+      );
       expect(snap.isWfh).toBe(true);
     });
   });
 
   describe('Case 7 — RECONCILIATION INVARIANT across all configurations', () => {
     const cases: Array<Partial<OfferInput>> = [
-      {},                                                                  // Case 1
-      { variablePct: 20, variableGuaranteed: false },                      // Case 2
-      { variablePct: 20, variableGuaranteed: true },                       // Case 3
-      { joiningBonusLpa: 1 },                                              // Case 4
-      { employerPf: 'none' },                                              // Case 5
-      { isWfh: true, targetCity: 'Mumbai' },                               // Case 6
+      {}, // Case 1
+      { variablePct: 20, variableGuaranteed: false }, // Case 2
+      { variablePct: 20, variableGuaranteed: true }, // Case 3
+      { joiningBonusLpa: 1 }, // Case 4
+      { employerPf: 'none' }, // Case 5
+      { isWfh: true, targetCity: 'Mumbai' }, // Case 6
     ];
 
-    it.each(cases)('fixedPay + variable + empPF + gratuity + joiningBonus = totalCTC', (overrides) => {
-      const input = makeInput(overrides);
-      const snap  = svc.computeOfferSnapshot(input, baseExpense, 100);
+    it.each(cases)(
+      'fixedPay + variable + empPF + gratuity + joiningBonus = totalCTC',
+      (overrides) => {
+        const input = makeInput(overrides);
+        const snap = svc.computeOfferSnapshot(input, baseExpense, 100);
 
-      const sum =
-        snap.fixedPayAnnual +
-        snap.variableAnnual +
-        snap.employerPfAnnual +
-        snap.gratuityAccrualAnnual +
-        snap.joiningBonusLpa * 100_000;
+        const sum =
+          snap.fixedPayAnnual +
+          snap.variableAnnual +
+          snap.employerPfAnnual +
+          snap.gratuityAccrualAnnual +
+          snap.joiningBonusLpa * 100_000;
 
-      const totalCtcAnnual = input.totalCtcLpa * 100_000;
-      expect(Math.abs(sum - totalCtcAnnual)).toBeLessThanOrEqual(1);
-    });
+        const totalCtcAnnual = input.totalCtcLpa * 100_000;
+        expect(Math.abs(sum - totalCtcAnnual)).toBeLessThanOrEqual(1);
+      },
+    );
   });
 
   describe('Case 8 — determinism', () => {
@@ -223,7 +250,11 @@ describe('CompensationService', () => {
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-01-01T00:00:00.000Z'));
 
-      const input = makeInput({ variablePct: 20, variableGuaranteed: true, joiningBonusLpa: 0.5 });
+      const input = makeInput({
+        variablePct: 20,
+        variableGuaranteed: true,
+        joiningBonusLpa: 0.5,
+      });
       const a = svc.computeOfferSnapshot(input, baseExpense, 105);
       const b = svc.computeOfferSnapshot(input, baseExpense, 105);
       expect(a).toEqual(b);
@@ -239,8 +270,8 @@ describe('CompensationService', () => {
       benchmarkCTC: 1_500_000,
       experienceYears: 5,
       benchmarkExperienceMidpoint: 5,
-      colIndexCurrent: 1.00,
-      colIndexTarget: 1.00,
+      colIndexCurrent: 1.0,
+      colIndexTarget: 1.0,
     };
 
     it.each([
@@ -269,7 +300,7 @@ describe('CompensationService', () => {
       const sameCity = svc.computeSalaryRange({ ...base });
       const diffCity = svc.computeSalaryRange({
         ...base,
-        colIndexCurrent: 1.00,
+        colIndexCurrent: 1.0,
         colIndexTarget: 1.15,
       });
       expect(diffCity.target).not.toBe(sameCity.target);
@@ -299,7 +330,10 @@ describe('CompensationService', () => {
     });
 
     it('role unmatched → medium, reason non-empty', () => {
-      const r = svc.computeConfidence({ ...allTrue, roleMatchedBenchmark: false });
+      const r = svc.computeConfidence({
+        ...allTrue,
+        roleMatchedBenchmark: false,
+      });
       expect(r.level).toBe('medium');
       expect(r.reason).toBeTruthy();
     });

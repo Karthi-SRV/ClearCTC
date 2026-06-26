@@ -49,7 +49,9 @@ export class ClaudeAiClient extends AiResponseParser {
           body: reqBody,
         });
       } catch (err: unknown) {
-        throw new AiParseError(`Anthropic connection error: ${err instanceof Error ? err.message : String(err)}`);
+        throw new AiParseError(
+          `Anthropic connection error: ${err instanceof Error ? err.message : String(err)}`,
+        );
       }
 
       if (response.status === 429) {
@@ -61,7 +63,7 @@ export class ClaudeAiClient extends AiResponseParser {
         const body = await response.text().catch(() => '');
         throw new AiParseError(
           `Anthropic API error: 429 Too Many Requests (${MAX_RETRIES} retries exhausted). ` +
-          body.slice(0, 200),
+            body.slice(0, 200),
         );
       }
 
@@ -88,7 +90,8 @@ export class ClaudeAiClient extends AiResponseParser {
     const promptTokens = usage?.input_tokens ?? 0;
     const outputTokens = usage?.output_tokens ?? 0;
     const totalTokens = promptTokens + outputTokens;
-    const costUsd = (promptTokens * 3.0) / 1_000_000 + (outputTokens * 15.0) / 1_000_000;
+    const costUsd =
+      (promptTokens * 3.0) / 1_000_000 + (outputTokens * 15.0) / 1_000_000;
 
     this.logger.log(
       `Claude call | Model: ${this.model} | Duration: ${durationMs}ms | ` +

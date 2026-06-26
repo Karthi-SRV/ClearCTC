@@ -32,7 +32,10 @@ const validOffer = {
 
 describe('OfferInputDto — employerPf', () => {
   it('accepts "statutory"', async () => {
-    const errs = await validateOffer({ ...validOffer, employerPf: 'statutory' });
+    const errs = await validateOffer({
+      ...validOffer,
+      employerPf: 'statutory',
+    });
     expect(errs).toHaveLength(0);
   });
 
@@ -115,7 +118,12 @@ describe('CreateOfferComparisonDto — array constraints', () => {
   });
 
   it('rejects 4 offers (ArrayMaxSize 3)', async () => {
-    const errs = await validateDto([validOffer, validOffer, validOffer, validOffer]);
+    const errs = await validateDto([
+      validOffer,
+      validOffer,
+      validOffer,
+      validOffer,
+    ]);
     expect(errs.length).toBeGreaterThan(0);
   });
 });

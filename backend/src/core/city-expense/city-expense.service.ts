@@ -14,15 +14,12 @@ import {
 } from '../../shared/schemas/city-expense.schema.js';
 import { CityExpenseCacheService } from './city-expense-cache.service.js';
 import { CityExpenseFetchService } from './city-expense-fetch.service.js';
+import { escapeRegex } from '../../shared/utils/regex.util.js';
 
 const FRESH_THRESHOLD_MS = 30 * 24 * 3600 * 1000; // 30 days
 
 const DEFAULT_FAMILY_TYPE: FamilyType = 'family';
 const DEFAULT_MEMBER_COUNT = 4;
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 export class CityExpenseUnavailableError extends Error {
   constructor(city: string) {
@@ -32,7 +29,9 @@ export class CityExpenseUnavailableError extends Error {
 }
 
 @Injectable()
-export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestroy {
+export class CityExpenseService
+  implements OnApplicationBootstrap, OnModuleDestroy
+{
   private readonly logger = new Logger(CityExpenseService.name);
   private fetchInterval?: NodeJS.Timeout;
 
@@ -41,7 +40,7 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
     private readonly model: Model<CityExpenseDocument>,
     private readonly cache: CityExpenseCacheService,
     private readonly fetch: CityExpenseFetchService,
-  ) { }
+  ) {}
 
   async onApplicationBootstrap(): Promise<void> {
     await this.seedMissingCities();
@@ -56,7 +55,9 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
   }
 
   private async seedMissingCities(): Promise<void> {
-    this.logger.log('Startup: syncing existing city expense records to cache...');
+    this.logger.log(
+      'Startup: syncing existing city expense records to cache...',
+    );
 
     try {
       const docs = await this.model
@@ -67,7 +68,7 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
         const city = doc.city;
         const alreadyCached = await this.cache.get(city);
         if (!alreadyCached) {
-          await this.cache.set(city, doc as unknown as CityExpense);
+          await this.cache.set(city, doc);
         }
         this.logger.log(`${city}: synced to cache (MongoDB → Redis)`);
       }
@@ -80,7 +81,9 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
   private isFetching = false;
 
   private async startBackgroundFetchLoop(): Promise<void> {
-    this.logger.log('Startup: starting background city expense fetch loop (every 15 seconds)...');
+    this.logger.log(
+      'Startup: starting background city expense fetch loop (every 15 seconds)...',
+    );
 
     this.fetchInterval = setInterval(async () => {
       if (this.isFetching) return;
@@ -88,10 +91,7 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
       try {
         const missing = await this.model
           .findOne({
-            $or: [
-              { individual: { $exists: false } },
-              { individual: null },
-            ],
+            $or: [{ individual: { $exists: false } }, { individual: null }],
           })
           .exec();
 
@@ -101,53 +101,61 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
           this.logger.log(`Background fetch: fetching expenses for ${city}...`);
           try {
             await this.fetchAndStore(city);
-            this.logger.log(`Background fetch: successfully stored expenses for ${city}`);
+            this.logger.log(
+              `Background fetch: successfully stored expenses for ${city}`,
+            );
           } catch (err: any) {
-            this.logger.error(`Background fetch failed for ${city}: ${err?.message}`);
+            this.logger.error(
+              `Background fetch failed for ${city}: ${err?.message}`,
+            );
           } finally {
             this.isFetching = false;
           }
         }
       } catch (err: any) {
-        this.logger.error(`Error in background city expense fetch loop: ${err?.message}`);
+        this.logger.error(
+          `Error in background city expense fetch loop: ${err?.message}`,
+        );
         this.isFetching = false;
       }
     }, 15000);
   }
 
   async getAllExpenses(): Promise<CityExpense[]> {
-    const docs = await this.model
-      .find({ individual: { $exists: true, $ne: null } })
-      .lean()
-      .exec();
-    return docs as unknown as CityExpense[];
+    const docs = await this.model.find().lean().exec();
+    return docs;
   }
 
   async getCityNames(): Promise<string[]> {
-    const docs = await this.model
-      .find({}, { city: 1, _id: 0 })
-      .lean()
-      .exec();
+    const docs = await this.model.find({}, { city: 1, _id: 0 }).lean().exec();
     return (docs as Array<{ city: string }>)
       .map((d) => d.city)
       .sort((a, b) => a.localeCompare(b));
   }
 
-  async getExpensesByFilter(
-    cities: string[],
-  ): Promise<CityExpense[]> {
+  async getCitiesWithIds(): Promise<Array<{ _id: string; city: string }>> {
+    const docs = await this.model.find({}, { city: 1, _id: 1 }).lean().exec();
+    return (docs as Array<{ _id: any; city: string }>)
+      .map((d) => ({ _id: d._id.toString(), city: d.city }))
+      .sort((a, b) => a.city.localeCompare(b.city));
+  }
+
+  async getExpensesByFilter(cities: string[]): Promise<CityExpense[]> {
     const normalized = cities.map((c) => c.trim()).filter(Boolean);
     if (!normalized.length) return this.getAllExpenses();
 
     const docs = await this.model
       .find({
-        city: { $in: normalized.map((c) => new RegExp(`^${escapeRegex(c)}$`, 'i')) },
-        individual: { $exists: true, $ne: null },
+        city: {
+          $in: normalized.map((c) => new RegExp(`^${escapeRegex(c)}$`, 'i')),
+        },
       })
       .lean()
       .exec();
 
-    const found = new Set(docs.map((d) => (d as unknown as CityExpense).city.toLowerCase()));
+    const found = new Set(
+      docs.map((d) => (d as unknown as CityExpense).city.toLowerCase()),
+    );
     const missing = normalized.filter((c) => !found.has(c.toLowerCase()));
 
     const fetched = await Promise.allSettled(
@@ -173,7 +181,8 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
   ): Promise<any> {
     // 1. Redis
     const cached = await this.cache.get(city);
-    if (cached && cached.individual) return this.resolveVirtualBreakdown(cached, familyType, memberCount);
+    if (cached && cached.individual)
+      return this.resolveVirtualBreakdown(cached, familyType, memberCount);
 
     // 2. MongoDB
     const doc = await this.model
@@ -190,7 +199,9 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
       const ageMs = Date.now() - new Date(doc.generatedAt!).getTime();
       if (ageMs > FRESH_THRESHOLD_MS) {
         void this.fetchAndStore(city).catch((err: Error) =>
-          this.logger.warn(`Background refresh failed for ${city}: ${err?.message}`),
+          this.logger.warn(
+            `Background refresh failed for ${city}: ${err?.message}`,
+          ),
         );
       }
 
@@ -198,7 +209,9 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
     }
 
     // 3. Safety net
-    this.logger.warn(`${city}: not in MongoDB or has no breakdown — fetching from AI`);
+    this.logger.warn(
+      `${city}: not in MongoDB or has no breakdown — fetching from AI`,
+    );
     try {
       const fresh = await this.fetchAndStore(city);
       return this.resolveVirtualBreakdown(fresh, familyType, memberCount);
@@ -207,29 +220,54 @@ export class CityExpenseService implements OnApplicationBootstrap, OnModuleDestr
     }
   }
 
-  async forceRefresh(
-    city: string,
-  ): Promise<CityExpense> {
+  async forceRefresh(city: string): Promise<CityExpense> {
     await this.cache.del(city);
     return this.fetchAndStore(city);
   }
 
-  private async fetchAndStore(
-    city: string,
-  ): Promise<CityExpense> {
+  async findOrCreate(city: string): Promise<CityExpense> {
+    const doc = await this.model
+      .findOne({ city: new RegExp(`^${escapeRegex(city)}$`, 'i') })
+      .exec();
+    if (doc) {
+      return doc.toObject ? doc.toObject() : doc;
+    }
+
+    // Create a shell city record immediately to let user proceed
+    const newCity = new this.model({
+      city,
+      isBase: false,
+    });
+    const saved = await newCity.save();
+
+    // Perform AI fetching and storage in the background
+    void this.fetchAndStore(city).catch((err: Error) => {
+      this.logger.error(
+        `Background city fetch failed for ${city}: ${err.message}`,
+      );
+    });
+
+    return saved.toObject ? saved.toObject() : saved;
+  }
+
+  private async fetchAndStore(city: string): Promise<CityExpense> {
     const result = await this.fetch.fetchExpense(city);
 
     let colIndex = 0;
 
-    const baseCity = await this.model
-        .findOne({ isBase: true })
-        .lean()
-        .exec();
+    const baseCity = await this.model.findOne({ isBase: true }).lean().exec();
     if (city.trim().toLowerCase() === baseCity?.city.toLowerCase()) {
       colIndex = 1.0;
     } else {
-      if (baseCity && baseCity.family4 && baseCity.family4.total && result.family4?.total) {
-        colIndex = Math.round((result.family4.total / baseCity.family4.total) * 100) / 100;
+      if (
+        baseCity &&
+        baseCity.family4 &&
+        baseCity.family4.total &&
+        result.family4?.total
+      ) {
+        colIndex =
+          Math.round((result.family4.total / baseCity.family4.total) * 100) /
+          100;
       } else {
         colIndex = 0;
       }

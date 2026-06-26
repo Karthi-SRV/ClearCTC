@@ -1,12 +1,19 @@
 import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Company, CompanyDocument } from '../../shared/schemas/company.schema.js';
+import {
+  Company,
+  CompanyDocument,
+} from '../../shared/schemas/company.schema.js';
 import type { AiClient } from '../ai/ai-client.interface.js';
-import { COMPANY_AI_CLIENT, GEMINI_QUOTA_EXHAUSTED_PREFIX } from '../ai/ai-client.interface.js';
+import {
+  COMPANY_AI_CLIENT,
+  GEMINI_QUOTA_EXHAUSTED_PREFIX,
+} from '../ai/ai-client.interface.js';
 import { AiParseError } from '../ai/ai-parse.error.js';
 import type { AiProfile } from './data-source.interface.js';
 import { CompanyFetchService } from './company-fetch.service.js';
+import { escapeRegex } from '../../shared/utils/regex.util.js';
 
 import { CompanyAiProfileSchema } from '../../shared/schemas/ai-validation.schemas.js';
 import {
@@ -19,7 +26,9 @@ const STALE_DAYS = 90;
 const GEMINI_REQUEST_GAP_MS = 15_000;
 
 function isQuotaExhausted(err: unknown): boolean {
-  return (err as Error)?.message?.startsWith(GEMINI_QUOTA_EXHAUSTED_PREFIX) ?? false;
+  return (
+    (err as Error)?.message?.startsWith(GEMINI_QUOTA_EXHAUSTED_PREFIX) ?? false
+  );
 }
 
 @Injectable()
@@ -29,7 +38,8 @@ export class CompanyAiProfileService implements OnModuleDestroy {
   private isShuttingDown = false;
 
   constructor(
-    @InjectModel(Company.name) private readonly companyModel: Model<CompanyDocument>,
+    @InjectModel(Company.name)
+    private readonly companyModel: Model<CompanyDocument>,
     @Inject(COMPANY_AI_CLIENT) private readonly ai: AiClient,
     private readonly companyFetch: CompanyFetchService,
   ) {}
@@ -68,7 +78,7 @@ export class CompanyAiProfileService implements OnModuleDestroy {
   // Public so it can also be triggered manually (e.g. admin endpoint).
 
   async seedMissingCompanies(): Promise<void> {
-    const unique =  await this.companyModel
+    const unique = await this.companyModel
       .find({})
       .select('name')
       .lean()
@@ -85,7 +95,9 @@ export class CompanyAiProfileService implements OnModuleDestroy {
       .exec();
     const existingNames = new Set(existing.map((c) => c.name.toLowerCase()));
 
-    const missing = unique.filter((data) => !existingNames.has(data.name.toLowerCase()));
+    const missing = unique.filter(
+      (data) => !existingNames.has(data.name.toLowerCase()),
+    );
     skipped = unique.length - missing.length;
 
     this.logger.log(
@@ -107,13 +119,15 @@ export class CompanyAiProfileService implements OnModuleDestroy {
         if (isQuotaExhausted(err)) {
           this.logger.error(
             `Gemini account quota exhausted after ${fetched} companies. ` +
-            `Restart the app tomorrow or set a new GEMINI_API_KEY to resume. ` +
-            `${missing.length - i - 1} companies skipped.`,
+              `Restart the app tomorrow or set a new GEMINI_API_KEY to resume. ` +
+              `${missing.length - i - 1} companies skipped.`,
           );
           break;
         }
         failed++;
-        this.logger.warn(`Company seed failed for ${data.name}: ${err instanceof Error ? err.message : String(err)}`);
+        this.logger.warn(
+          `Company seed failed for ${data.name}: ${err instanceof Error ? err.message : String(err)}`,
+        );
       }
       if (i < missing.length - 1) {
         await this.sleep(GEMINI_REQUEST_GAP_MS);
@@ -182,8 +196,8 @@ export class CompanyAiProfileService implements OnModuleDestroy {
           if (isQuotaExhausted(err)) {
             this.logger.error(
               `Gemini account quota exhausted after ${generated} aiProfiles. ` +
-              `Restart the app tomorrow or set a new GEMINI_API_KEY to resume. ` +
-              `${needsProfile.length - i - 1} profiles skipped.`,
+                `Restart the app tomorrow or set a new GEMINI_API_KEY to resume. ` +
+                `${needsProfile.length - i - 1} profiles skipped.`,
             );
             break;
           }
@@ -207,7 +221,11 @@ export class CompanyAiProfileService implements OnModuleDestroy {
   private async generateProfile(
     company: Pick<CompanyDocument, 'name' | 'ratings' | 'reviews'>,
   ): Promise<Omit<AiProfile, 'generatedAt'>> {
-    const userPrompt = buildCompanyProfileUserPrompt(company.name, company.ratings, company.reviews);
+    const userPrompt = buildCompanyProfileUserPrompt(
+      company.name,
+      company.ratings,
+      company.reviews,
+    );
 
     const raw = await this.ai.call(COMPANY_PROFILE_SYSTEM_PROMPT, userPrompt);
     return this.validateProfileResponse(raw, company.name);
@@ -220,7 +238,46 @@ export class CompanyAiProfileService implements OnModuleDestroy {
     try {
       return CompanyAiProfileSchema.parse(raw);
     } catch (err: any) {
-      throw new AiParseError(`aiProfile validation failed for ${companyName}: ${err.message ?? err}`);
+      throw new AiParseError(
+        `aiProfile validation failed for ${companyName}: ${err.message ?? err}`,
+      );
     }
+  }
+
+  async addCompanyAndGenerateProfile(name: string): Promise<CompanyDocument> {
+    const data = await this.companyFetch.fetchCompany(name);
+
+    const company = await this.companyModel
+      .findOneAndUpdate(
+        { name: new RegExp(`^${escapeRegex(name)}$`, 'i') },
+        {
+          $set: {
+            name, // exact casing
+            aliases: data.aliases,
+            roles: data.roles,
+            ratings: data.ratings,
+            reviews: data.reviews,
+            dataAsOf: new Date(),
+          },
+        },
+        { upsert: true, new: true },
+      )
+      .exec();
+
+    if (!company) {
+      throw new Error(`Failed to upsert company: ${name}`);
+    }
+
+    try {
+      const profile = await this.generateProfile(company);
+      company.aiProfile = { ...profile, generatedAt: new Date() };
+      await company.save();
+    } catch (err) {
+      this.logger.warn(
+        `Failed to generate profile for newly added company ${name}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    return company;
   }
 }

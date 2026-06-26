@@ -25,12 +25,18 @@ const baseOffer = {
 };
 
 const baseExpenseBreakdown = {
-  rent: 20000, groceries: 5000, utilities: 2000, transport: 3000,
-  foodDining: 4000, personalLifestyle: 3000, miscellaneous: 2000, total: 39000,
+  rent: 20000,
+  groceries: 5000,
+  utilities: 2000,
+  transport: 3000,
+  foodDining: 4000,
+  personalLifestyle: 3000,
+  miscellaneous: 2000,
+  total: 39000,
 };
 
 function makeService({
-  user = baseUser as ReturnType<typeof Object.assign> | null,
+  user = baseUser,
   colIndex = 1.19,
   company = null as object | null,
 }: {
@@ -39,33 +45,35 @@ function makeService({
   company?: object | null;
 } = {}) {
   const compMock = {
-    computeOfferSnapshot: jest.fn().mockImplementation((offer: typeof baseOffer) => ({
-      companyName: offer.companyName,
-      totalCtcLpa: offer.totalCtcLpa,
-      variablePct: offer.variablePct,
-      variableGuaranteed: offer.variableGuaranteed,
-      joiningBonusLpa: offer.joiningBonusLpa,
-      employerPf: offer.employerPf,
-      targetCity: offer.targetCity,
-      isWfh: offer.isWfh,
-      monthlyInHand: 80000,
-      annualInHand: 960000,
-      monthlyExpenses: 39000,
-      monthlySavings: 41000,
-      annualSavings: 492000,
-      basicMonthly: 16667,
-      employeePfMonthly: 1800,
-      employeePfAnnual: 21600,
-      employerPfAnnual: 21600,
-      gratuityAccrualAnnual: 9615,
-      effectiveCtcAnnual: 2500000,
-      taxableIncome: 2000000,
-      incomeTaxAnnual: 100000,
-      variableAnnual: 250000,
-      fixedPayAnnual: 2250000,
-      colIndexUsed: colIndex,
-      expenseBreakdown: baseExpenseBreakdown,
-    })),
+    computeOfferSnapshot: jest
+      .fn()
+      .mockImplementation((offer: typeof baseOffer) => ({
+        companyName: offer.companyName,
+        totalCtcLpa: offer.totalCtcLpa,
+        variablePct: offer.variablePct,
+        variableGuaranteed: offer.variableGuaranteed,
+        joiningBonusLpa: offer.joiningBonusLpa,
+        employerPf: offer.employerPf,
+        targetCity: offer.targetCity,
+        isWfh: offer.isWfh,
+        monthlyInHand: 80000,
+        annualInHand: 960000,
+        monthlyExpenses: 39000,
+        monthlySavings: 41000,
+        annualSavings: 492000,
+        basicMonthly: 16667,
+        employeePfMonthly: 1800,
+        employeePfAnnual: 21600,
+        employerPfAnnual: 21600,
+        gratuityAccrualAnnual: 9615,
+        effectiveCtcAnnual: 2500000,
+        taxableIncome: 2000000,
+        incomeTaxAnnual: 100000,
+        variableAnnual: 250000,
+        fixedPayAnnual: 2250000,
+        colIndexUsed: colIndex,
+        expenseBreakdown: baseExpenseBreakdown,
+      })),
   };
 
   const dataMock = {
@@ -116,7 +124,9 @@ describe('SalaryComparisonService.execute', () => {
 
   it('throws NotFoundException when user not found', async () => {
     const { service } = makeService({ user: null });
-    await expect(service.execute('missing', dto)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('missing', dto)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('uses currentCity as expenseCity when offer isWfh', async () => {
@@ -128,7 +138,9 @@ describe('SalaryComparisonService.execute', () => {
 
     await service.execute('user1', wfhDto);
     expect(cityExpenseMock.getExpenseBreakdown).toHaveBeenCalledWith(
-      'Bangalore', 'individual', 1,
+      'Bangalore',
+      'individual',
+      1,
     );
   });
 
@@ -140,7 +152,9 @@ describe('SalaryComparisonService.execute', () => {
 
     await service.execute('user1', officeDto);
     expect(cityExpenseMock.getExpenseBreakdown).toHaveBeenCalledWith(
-      'Hyderabad', 'family', 4,
+      'Hyderabad',
+      'family',
+      4,
     );
   });
 
@@ -155,16 +169,31 @@ describe('SalaryComparisonService.execute', () => {
   it('maps company ratings and reviews when company exists in DB', async () => {
     const company = {
       name: 'Acme',
-      ratings: [{ source: 'Glassdoor', wlb: 4, culture: 4.5, growth: 3.5, jobSecurity: 4 }],
+      ratings: [
+        {
+          source: 'Glassdoor',
+          wlb: 4,
+          culture: 4.5,
+          growth: 3.5,
+          jobSecurity: 4,
+        },
+      ],
       reviews: [
         { text: 'Great WLB', source: 'Glassdoor' },
         { text: 'Good pay', source: 'AmbitionBox' },
         { text: 'Extra review', source: 'LinkedIn' },
       ],
-      aiProfile: { companySize: 'Large (50,000+)', basicInsurance: 'Group Mediclaim', otherBenefits: ['Remote'] },
+      aiProfile: {
+        companySize: 'Large (50,000+)',
+        basicInsurance: 'Group Mediclaim',
+        otherBenefits: ['Remote'],
+      },
     };
     const { service } = makeService({ company });
-    const result = await service.execute('user1', { offers: [baseOffer], familyType: 'individual' });
+    const result = await service.execute('user1', {
+      offers: [baseOffer],
+      familyType: 'individual',
+    });
 
     expect(result.companyDetails[0].employeeRating.overall).toBe(4);
     expect(result.companyDetails[0].reviews).toHaveLength(2);
@@ -177,7 +206,9 @@ describe('SalaryComparisonService.execute', () => {
 
     await service.execute('user1', minimalDto);
     expect(cityExpenseMock.getExpenseBreakdown).toHaveBeenCalledWith(
-      expect.any(String), 'family', 4,
+      expect.any(String),
+      'family',
+      4,
     );
   });
 });

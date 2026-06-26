@@ -28,9 +28,9 @@ export class RiskAssessmentDto {
 }
 
 export class ScoreBreakdownDto {
-  financial: number;   // 0–40
+  financial: number; // 0–40
   qualitative: number; // 0–40
-  risk: number;        // 0–20
+  risk: number; // 0–20
 }
 
 export class OfferResultDto {

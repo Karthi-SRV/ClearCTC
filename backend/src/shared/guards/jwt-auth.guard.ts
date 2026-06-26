@@ -26,7 +26,9 @@ export class JwtAuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const request = ctx.switchToHttp().getRequest<Request & { user: AuthPayload }>();
+    const request = ctx
+      .switchToHttp()
+      .getRequest<Request & { user: AuthPayload }>();
     const token = this.extractToken(request);
     if (!token) throw new UnauthorizedException('Missing Bearer token');
 

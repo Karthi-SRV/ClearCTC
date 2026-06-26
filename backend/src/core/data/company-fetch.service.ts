@@ -43,15 +43,23 @@ export class CompanyFetchService {
   async fetchCompany(name: string): Promise<CompanyFetchResult> {
     const userPrompt = buildCompanyFetchUserPrompt(name);
 
-    const raw = await this.ai.call(COMPANY_FETCH_SYSTEM_PROMPT, userPrompt) as Record<string, unknown>;
+    const raw = (await this.ai.call(
+      COMPANY_FETCH_SYSTEM_PROMPT,
+      userPrompt,
+    )) as Record<string, unknown>;
     return this.validate(raw, name);
   }
 
-  private validate(raw: Record<string, unknown>, name: string): CompanyFetchResult {
+  private validate(
+    raw: Record<string, unknown>,
+    name: string,
+  ): CompanyFetchResult {
     try {
-      return CompanyFetchSchema.parse(raw) as CompanyFetchResult;
+      return CompanyFetchSchema.parse(raw);
     } catch (err: any) {
-      throw new AiParseError(`Company data validation failed for ${name}: ${err.message ?? err}`);
+      throw new AiParseError(
+        `Company data validation failed for ${name}: ${err.message ?? err}`,
+      );
     }
   }
 }

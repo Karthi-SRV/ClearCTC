@@ -1,4 +1,9 @@
-import { MAX_RETRIES, RETRY_DELAYS_MS, retryDelay, sleep } from './ai-retry.util.js';
+import {
+  MAX_RETRIES,
+  RETRY_DELAYS_MS,
+  retryDelay,
+  sleep,
+} from './ai-retry.util.js';
 
 describe('sleep', () => {
   it('resolves after approximately the given delay', async () => {
@@ -37,7 +42,7 @@ describe('constants', () => {
 
   it('RETRY_DELAYS_MS has 3 entries in ascending order', () => {
     expect(RETRY_DELAYS_MS).toHaveLength(3);
-    expect(RETRY_DELAYS_MS[0]).toBeLessThan(RETRY_DELAYS_MS[1]!);
-    expect(RETRY_DELAYS_MS[1]!).toBeLessThan(RETRY_DELAYS_MS[2]!);
+    expect(RETRY_DELAYS_MS[0]).toBeLessThan(RETRY_DELAYS_MS[1]);
+    expect(RETRY_DELAYS_MS[1]).toBeLessThan(RETRY_DELAYS_MS[2]);
   });
 });

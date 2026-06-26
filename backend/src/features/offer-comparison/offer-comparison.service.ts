@@ -5,13 +5,20 @@ import { AiParseError } from '../../core/ai/ai-parse.error.js';
 import type { AiClient } from '../../core/ai/ai-client.interface.js';
 import { COMPANY_AI_CLIENT } from '../../core/ai/ai-client.interface.js';
 import { CompensationService } from '../../core/compensation/compensation.service.js';
-import type { DataSource, CompanyRecord, RatingSet } from '../../core/data/data-source.interface.js';
+import type {
+  DataSource,
+  CompanyRecord,
+  RatingSet,
+} from '../../core/data/data-source.interface.js';
 import { DATA_SOURCE } from '../../core/data/data-source.interface.js';
 import { CityExpenseService } from '../../core/city-expense/city-expense.service.js';
 import { User, UserDocument } from '../../shared/schemas/user.schema.js';
 import type { OfferInputDto } from '../../shared/dtos/offer-input.dto.js';
 import { CreateOfferComparisonDto } from '../../shared/dtos/offer-input.dto.js';
-import type { OfferSnapshot, ExpenseBreakdownItem } from '../../core/compensation/compensation.service.js';
+import type {
+  OfferSnapshot,
+  ExpenseBreakdownItem,
+} from '../../core/compensation/compensation.service.js';
 import type {
   OfferComparisonResponseDto,
   OfferResultDto,
@@ -78,7 +85,7 @@ export class OfferComparisonService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @Inject(COMPANY_AI_CLIENT) private readonly ai: AiClient,
     private readonly offersService: OffersService,
-  ) { }
+  ) {}
 
   // ── Stale detection ──────────────────────────────────────────────────────────
 
@@ -90,7 +97,7 @@ export class OfferComparisonService {
 
   validateAiResponse(raw: object, inputNames: string[]): AiResponse {
     try {
-      const result = AiOfferComparisonSchema.parse(raw) as unknown as AiResponse;
+      const result = AiOfferComparisonSchema.parse(raw);
 
       if (!inputNames.includes(result.recommendation?.bestOffer)) {
         throw new Error(
@@ -100,7 +107,9 @@ export class OfferComparisonService {
 
       return result;
     } catch (err: any) {
-      throw new AiParseError(`AI response validation failed: ${err.message ?? err}`);
+      throw new AiParseError(
+        `AI response validation failed: ${err.message ?? err}`,
+      );
     }
   }
 
@@ -111,25 +120,38 @@ export class OfferComparisonService {
     dto: CreateOfferComparisonDto,
   ): Promise<OfferComparisonResponseDto> {
     try {
-      this.logger.log(`[execute] START | userId: ${userId} | offers: ${dto.offers?.length || 0}`);
+      this.logger.log(
+        `[execute] START | userId: ${userId} | offers: ${dto.offers?.length || 0}`,
+      );
 
       const user = await this.userModel.findById(userId).lean().exec();
       if (!user) throw new NotFoundException('User not found');
 
-      this.logger.debug(`[execute] User loaded | currentCity: ${user.currentCity} | currentCtcLpa: ${user.currentCtcLpa}`);
+      this.logger.debug(
+        `[execute] User loaded | currentCity: ${user.currentCity} | currentCtcLpa: ${user.currentCtcLpa}`,
+      );
 
       const familyType = dto.familyType ?? 'family';
-      const memberCount = familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
+      const memberCount =
+        familyType === 'individual' ? 1 : (dto.memberCount ?? 4);
 
       // 1. For each offer fetch city expenses + COL index (in parallel)
-      this.logger.debug(`[execute] Fetching city expenses and COL indices for ${dto.offers.length} offers`);
+      this.logger.debug(
+        `[execute] Fetching city expenses and COL indices for ${dto.offers.length} offers`,
+      );
       const enriched = await Promise.all(
         dto.offers.map(async (raw: OfferInputDto) => {
           const expenseCity = raw.isWfh ? user.currentCity : raw.targetCity;
-          this.logger.debug(`[execute] Fetching data for ${raw.companyName} | city: ${expenseCity} | isWfh: ${raw.isWfh}`);
+          this.logger.debug(
+            `[execute] Fetching data for ${raw.companyName} | city: ${expenseCity} | isWfh: ${raw.isWfh}`,
+          );
 
           const [expenseDoc, colIndex] = await Promise.all([
-            this.cityExpenseService.getExpenseBreakdown(expenseCity, familyType, memberCount),
+            this.cityExpenseService.getExpenseBreakdown(
+              expenseCity,
+              familyType,
+              memberCount,
+            ),
             this.data.getCOLIndex(expenseCity),
           ]);
 
@@ -144,32 +166,39 @@ export class OfferComparisonService {
             total: expenseDoc.breakdown.total,
           };
 
-          this.logger.debug(`[execute] Data fetched | ${raw.companyName} | colIndex: ${colIndex} | totalExpense: ${expenseDoc.breakdown.total}`);
+          this.logger.debug(
+            `[execute] Data fetched | ${raw.companyName} | colIndex: ${colIndex} | totalExpense: ${expenseDoc.breakdown.total}`,
+          );
           return { raw, expenseBreakdown, colIndexUsed: colIndex ?? 1.0 };
         }),
       );
 
       // 2. Deterministic computation — all before AI call
-      this.logger.debug(`[execute] Computing offer snapshots for ${enriched.length} offers`);
-      const snapshots: OfferSnapshot[] = enriched.map(({ raw, expenseBreakdown, colIndexUsed }) =>
-        this.comp.computeOfferSnapshot(
-          {
-            companyName: raw.companyName,
-            totalCtcLpa: raw.totalCtcLpa,
-            variablePct: raw.variablePct,
-            variableGuaranteed: raw.variableGuaranteed,
-            joiningBonusLpa: raw.joiningBonusLpa,
-            employerPf: raw.employerPf,
-            targetCity: raw.targetCity,
-            isWfh: raw.isWfh,
-          },
-          expenseBreakdown,
-          colIndexUsed,
-        ),
+      this.logger.debug(
+        `[execute] Computing offer snapshots for ${enriched.length} offers`,
+      );
+      const snapshots: OfferSnapshot[] = enriched.map(
+        ({ raw, expenseBreakdown, colIndexUsed }) =>
+          this.comp.computeOfferSnapshot(
+            {
+              companyName: raw.companyName,
+              totalCtcLpa: raw.totalCtcLpa,
+              variablePct: raw.variablePct,
+              variableGuaranteed: raw.variableGuaranteed,
+              joiningBonusLpa: raw.joiningBonusLpa,
+              employerPf: raw.employerPf,
+              targetCity: raw.targetCity,
+              isWfh: raw.isWfh,
+            },
+            expenseBreakdown,
+            colIndexUsed,
+          ),
       );
 
       snapshots.forEach((snap) => {
-        this.logger.debug(`[execute] Snapshot computed | ${snap.companyName} | ctc: ${snap.totalCtcLpa} | inHand/mo: ${snap.monthlyInHand.toFixed(2)}`);
+        this.logger.debug(
+          `[execute] Snapshot computed | ${snap.companyName} | ctc: ${snap.totalCtcLpa} | inHand/mo: ${snap.monthlyInHand.toFixed(2)}`,
+        );
       });
 
       // 3. Persist deterministic snapshots before any AI call
@@ -183,28 +212,46 @@ export class OfferComparisonService {
 
       // 4. Fetch company records
       // aiProfile is included in each record when pre-generated at startup
-      this.logger.debug(`[execute] Fetching company records for ${dto.offers.length} offers`);
+      this.logger.debug(
+        `[execute] Fetching company records for ${dto.offers.length} offers`,
+      );
       const companyRecords = await Promise.all(
-        dto.offers.map((raw: OfferInputDto) => this.data.getCompany(raw.companyName)),
+        dto.offers.map((raw: OfferInputDto) =>
+          this.data.getCompany(raw.companyName),
+        ),
       );
 
       const companiesFound = companyRecords.filter((c) => c !== null).length;
       const profilesFound = companyRecords.filter((c) => c?.aiProfile).length;
-      this.logger.debug(`[execute] Company records fetched | found: ${companiesFound}/${companyRecords.length} | aiProfiles: ${profilesFound}`);
+      this.logger.debug(
+        `[execute] Company records fetched | found: ${companiesFound}/${companyRecords.length} | aiProfiles: ${profilesFound}`,
+      );
 
       // 5. Single AI call — all offers in one context
       // AI receives pre-stored aiProfiles (no re-derivation) and only returns
       // score, scoreBreakdown, and recommendation.
       this.logger.log(`[execute] Calling AI for scoring and recommendation`);
-      const userPrompt = this.buildPrompt(user.currentCity, user.currentCtcLpa, snapshots, companyRecords);
-      const rawAiResponse = await this.ai.call(OFFER_COMPARISON_SYSTEM_PROMPT, userPrompt);
+      const userPrompt = this.buildPrompt(
+        user.currentCity,
+        user.currentCtcLpa,
+        snapshots,
+        companyRecords,
+      );
+      const rawAiResponse = await this.ai.call(
+        OFFER_COMPARISON_SYSTEM_PROMPT,
+        userPrompt,
+      );
       const inputNames = dto.offers.map((o) => o.companyName);
       const aiResult = this.validateAiResponse(rawAiResponse, inputNames);
 
-      this.logger.log(`[execute] AI complete | bestOffer: ${aiResult.recommendation?.bestOffer} | confidence: ${aiResult.recommendation?.confidence}`);
+      this.logger.log(
+        `[execute] AI complete | bestOffer: ${aiResult.recommendation?.bestOffer} | confidence: ${aiResult.recommendation?.confidence}`,
+      );
 
       // 6. Merge deterministic + pre-stored profiles + AI scoring
-      this.logger.debug(`[execute] Merging results for ${snapshots.length} offers`);
+      this.logger.debug(
+        `[execute] Merging results for ${snapshots.length} offers`,
+      );
       const offers: OfferResultDto[] = snapshots.map((snap, i) => {
         const rec = companyRecords[i];
         const aiOffer = aiResult.offers.find(
@@ -246,23 +293,41 @@ export class OfferComparisonService {
           annualSavings: snap.annualSavings,
           expenseBreakdown: snap.expenseBreakdown,
           // qualitative — from pre-stored aiProfile, with AI inline fallback for unknown companies
-          companySize:    aiOffer.companySize    ?? profile?.companySize    ?? 'Not available in data',
-          basicInsurance: aiOffer.basicInsurance ?? profile?.basicInsurance ?? 'Not available in data',
-          otherBenefits:  aiOffer.otherBenefits  ?? profile?.otherBenefits  ?? [],
-          pros:           aiOffer.pros           ?? profile?.pros           ?? [],
-          cons:           aiOffer.cons           ?? profile?.cons           ?? [],
-          riskAssessment: aiOffer.riskAssessment ?? (profile
-            ? { level: profile.riskLevel, factors: profile.riskFactors, benefitForRisk: profile.benefitForRisk }
-            : { level: 'medium' as const, factors: [], benefitForRisk: 'Not available in data' }),
+          companySize:
+            aiOffer.companySize ??
+            profile?.companySize ??
+            'Not available in data',
+          basicInsurance:
+            aiOffer.basicInsurance ??
+            profile?.basicInsurance ??
+            'Not available in data',
+          otherBenefits: aiOffer.otherBenefits ?? profile?.otherBenefits ?? [],
+          pros: aiOffer.pros ?? profile?.pros ?? [],
+          cons: aiOffer.cons ?? profile?.cons ?? [],
+          riskAssessment:
+            aiOffer.riskAssessment ??
+            (profile
+              ? {
+                  level: profile.riskLevel,
+                  factors: profile.riskFactors,
+                  benefitForRisk: profile.benefitForRisk,
+                }
+              : {
+                  level: 'medium' as const,
+                  factors: [],
+                  benefitForRisk: 'Not available in data',
+                }),
           // employeeRating — always from seeded ratings[], never from AI
           employeeRating: this.buildEmployeeRating(rec?.ratings),
           // AI scoring
-          score:          aiOffer.score,
+          score: aiOffer.score,
           scoreBreakdown: aiOffer.scoreBreakdown,
         };
       });
 
-      this.logger.log(`[execute] COMPLETE | userId: ${userId} | offers: ${offers.length}`);
+      this.logger.log(
+        `[execute] COMPLETE | userId: ${userId} | offers: ${offers.length}`,
+      );
 
       return {
         userId,
@@ -272,21 +337,37 @@ export class OfferComparisonService {
         dataDisclaimer: DATA_DISCLAIMER,
       };
     } catch (err) {
-      this.logger.error(`[execute] FAILED | userId: ${userId} | error: ${(err as Error).message}`);
+      this.logger.error(
+        `[execute] FAILED | userId: ${userId} | error: ${(err as Error).message}`,
+      );
       throw err;
     }
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
-  private buildEmployeeRating(ratings: RatingSet[] | undefined): EmployeeRatingDto {
+  private buildEmployeeRating(
+    ratings: RatingSet[] | undefined,
+  ): EmployeeRatingDto {
     if (!ratings || ratings.length === 0) {
-      return { overall: 0, wlb: 0, culture: 0, growth: 0, jobSecurity: 0, source: 'Not available', disagreementFlag: null };
+      return {
+        overall: 0,
+        wlb: 0,
+        culture: 0,
+        growth: 0,
+        jobSecurity: 0,
+        source: 'Not available',
+        disagreementFlag: null,
+      };
     }
 
     const primary =
-      ratings.find((r) => r.source.toLowerCase().includes('ambitionbox')) ?? ratings[0];
-    const overall = +((primary.wlb + primary.culture + primary.growth + primary.jobSecurity) / 4).toFixed(1);
+      ratings.find((r) => r.source.toLowerCase().includes('ambitionbox')) ??
+      ratings[0];
+    const overall = +(
+      (primary.wlb + primary.culture + primary.growth + primary.jobSecurity) /
+      4
+    ).toFixed(1);
 
     let disagreementFlag: string | null = null;
     if (ratings.length >= 2) {
@@ -294,7 +375,10 @@ export class OfferComparisonService {
       const dims = ['wlb', 'culture', 'growth', 'jobSecurity'] as const;
       const flagged = dims
         .filter((d) => Math.abs(primary[d] - secondary[d]) > 0.5)
-        .map((d) => `${d} (${primary.source}: ${primary[d]}, ${secondary.source}: ${secondary[d]})`);
+        .map(
+          (d) =>
+            `${d} (${primary.source}: ${primary[d]}, ${secondary.source}: ${secondary[d]})`,
+        );
       if (flagged.length > 0) {
         disagreementFlag = `Sources disagree on: ${flagged.join('; ')}`;
       }
@@ -336,14 +420,22 @@ export class OfferComparisonService {
     const companyContext = snapshots.map((snap, i) => {
       const rec = companyRecords[i];
       if (!rec) {
-        return { companyName: snap.companyName, profileType: 'unknown' as const };
+        return {
+          companyName: snap.companyName,
+          profileType: 'unknown' as const,
+        };
       }
 
       // Compute per-source ratings deterministically (overall = mean of 4 dims)
       const ratingsBySource = rec.ratings.map((r) => ({
         source: r.source,
-        overall: +((r.wlb + r.culture + r.growth + r.jobSecurity) / 4).toFixed(1),
-        wlb: r.wlb, culture: r.culture, growth: r.growth, jobSecurity: r.jobSecurity,
+        overall: +((r.wlb + r.culture + r.growth + r.jobSecurity) / 4).toFixed(
+          1,
+        ),
+        wlb: r.wlb,
+        culture: r.culture,
+        growth: r.growth,
+        jobSecurity: r.jobSecurity,
       }));
 
       if (rec.aiProfile) {
@@ -377,19 +469,27 @@ export class OfferComparisonService {
 
     // Schema varies based on whether AI needs to derive qualitative data inline
     const schemaResponse = {
-      offers: [{
-        companyName: 'string',
-        ...(hasUnknown ? {
-          companySize: 'string (only for profileType=derive/unknown)',
-          basicInsurance: 'string (only for profileType=derive/unknown)',
-          otherBenefits: ['string'],
-          pros: ['string'],
-          cons: ['string'],
-          riskAssessment: { level: 'low|medium|high', factors: ['string'], benefitForRisk: 'string' },
-        } : {}),
-        score: 0,
-        scoreBreakdown: { financial: 0, qualitative: 0, risk: 0 },
-      }],
+      offers: [
+        {
+          companyName: 'string',
+          ...(hasUnknown
+            ? {
+                companySize: 'string (only for profileType=derive/unknown)',
+                basicInsurance: 'string (only for profileType=derive/unknown)',
+                otherBenefits: ['string'],
+                pros: ['string'],
+                cons: ['string'],
+                riskAssessment: {
+                  level: 'low|medium|high',
+                  factors: ['string'],
+                  benefitForRisk: 'string',
+                },
+              }
+            : {}),
+          score: 0,
+          scoreBreakdown: { financial: 0, qualitative: 0, risk: 0 },
+        },
+      ],
       recommendation: {
         bestOffer: 'string',
         suggestion: 'string',

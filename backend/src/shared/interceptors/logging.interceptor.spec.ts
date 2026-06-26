@@ -63,7 +63,10 @@ describe('LoggingInterceptor', () => {
     const request = { method: 'GET', url: '/unknown-path', route: undefined };
     const response = { statusCode: 200 };
     const ctx = {
-      switchToHttp: () => ({ getRequest: () => request, getResponse: () => response }),
+      switchToHttp: () => ({
+        getRequest: () => request,
+        getResponse: () => response,
+      }),
     } as never;
     const next = { handle: () => of({}) };
 
