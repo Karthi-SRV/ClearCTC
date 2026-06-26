@@ -1,8 +1,8 @@
-# comp-copilot-new-city
+# clearctc-new-city
 
-Step-by-step guide to add a new Indian city to the comp-copilot expense system. Use this skill when the user wants to add a city to the city-expense database or COL index.
+Step-by-step guide to add a new Indian city to the clearctc expense system. Use this skill when the user wants to add a city to the city-expense database or COL index.
 
-**Trigger:** `/comp-copilot-new-city`
+**Trigger:** `/clearctc-new-city`
 
 ---
 
@@ -75,7 +75,7 @@ curl -s "http://localhost:3000/api/v1/city-expenses?cities=NewCity" | python3 -m
 
 MongoDB direct check:
 ```bash
-docker exec comp-copilot-mongo-1 mongosh comp-copilot \
+docker exec clearctc-mongo-1 mongosh clearctc \
   --eval 'db["city-expenses"].findOne({ city: "New City" }, { city:1, generatedAt:1, "individual.total":1 })'
 ```
 
@@ -103,7 +103,7 @@ The frontend fetches the city list dynamically from `GET /api/v1/cities` — no 
 1. Remove from `STANDARD_CITIES` in `scripts/seed.ts`
 2. Delete the MongoDB document:
    ```bash
-   docker exec comp-copilot-mongo-1 mongosh comp-copilot \
+   docker exec clearctc-mongo-1 mongosh clearctc \
      --eval 'db["city-expenses"].deleteOne({ city: "Old City" })'
    ```
 3. Clear Redis cache entry:

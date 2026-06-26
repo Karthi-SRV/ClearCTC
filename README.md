@@ -1,6 +1,6 @@
-# Comp Copilot
+# ClearCTC
 
-Comp Copilot is a full-stack compensation evaluation tool designed specifically for Indian software engineers switching jobs. It helps candidates make informed decisions across two distinct phases of their career transition: before HR conversations begin (estimating city-adjusted salaries) and after offers arrive (comparing actual take-home pay, benefits, market benchmarks, and company reviews).
+ClearCTC is a full-stack compensation evaluation tool designed specifically for Indian software engineers switching jobs. It helps candidates make informed decisions across two distinct phases of their career transition: before HR conversations begin (estimating city-adjusted salaries) and after offers arrive (comparing actual take-home pay, benefits, market benchmarks, and company reviews).
 
 ---
 
@@ -24,7 +24,7 @@ Compare 2–3 actual job offers on real take-home pay (factoring in the new-regi
 
 ## 🛡️ The Trust Boundary (Core Philosophy)
 
-To prevent AI hallucination of critical details, Comp Copilot implements a strict **Trust Boundary** between deterministic calculations and AI reasoning:
+To prevent AI hallucination of critical details, ClearCTC implements a strict **Trust Boundary** between deterministic calculations and AI reasoning:
 
 > [!IMPORTANT]
 > **The AI reasons and explains, but it NEVER originates a financial fact or modifies money calculations.**
@@ -64,7 +64,7 @@ All financial math (CTC breakdown to in-hand, tax slabs, PF, gratuity, and COL a
 ## 📂 Directory Structure
 
 ```
-comp-copilot/
+clearctc/
 ├── backend/                  # NestJS backend application
 │   ├── src/
 │   │   ├── core/             # Shared business logic, database wrappers, financial math (no controllers)
@@ -173,7 +173,7 @@ npm run build
 
 ## 📊 Observability & Metrics
 
-Comp Copilot has pre-configured Grafana dashboards to monitor your application:
+ClearCTC has pre-configured Grafana dashboards to monitor your application:
 1. Open Grafana at `http://localhost:3001` (login credentials are defined in your root `.env` / default variables).
 2. The dashboard shows API request metrics, latency percentiles, error rates, and system resources from `/metrics`.
 3. View logs in real-time aggregated through Loki via Winston transports.

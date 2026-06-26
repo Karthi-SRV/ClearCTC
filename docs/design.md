@@ -470,7 +470,7 @@ All fields: non-null, positive integer. Total auto-corrected to sum if arithmeti
 
 ```
 # backend/.env
-MONGODB_URI=mongodb://localhost:27017/comp-copilot
+MONGODB_URI=mongodb://localhost:27017/clearctc
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=<secret>
 JWT_EXPIRES_IN=7d
@@ -492,7 +492,7 @@ GRAFANA_ADMIN_PASSWORD=<password>
 
 ## 9. Observability
 
-- `prom-client` `collectDefaultMetrics` with prefix `comp_copilot_`.
+- `prom-client` `collectDefaultMetrics` with prefix `clearctc_`.
 - `LoggingInterceptor` as global `APP_INTERCEPTOR`.
 - `nest-winston` with console + optional Loki transports.
 - Grafana + Prometheus + Loki wired in Docker Compose. Prometheus scrapes `host.docker.internal:3000/metrics` every 15 s.

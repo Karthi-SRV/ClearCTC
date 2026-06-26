@@ -1,12 +1,12 @@
-# Security Policy — Comp Copilot
+# Security Policy — ClearCTC
 
-Comp Copilot is built with security as a primary design constraint. This document provides a comprehensive breakdown of the application's security architecture, JWT session lifecycle, secret management strategy, and the strict **AI Trust Boundary**. It also documents the findings from our security review of the active codebase and lists actionable production hardening recommendations.
+ClearCTC is built with security as a primary design constraint. This document provides a comprehensive breakdown of the application's security architecture, JWT session lifecycle, secret management strategy, and the strict **AI Trust Boundary**. It also documents the findings from our security review of the active codebase and lists actionable production hardening recommendations.
 
 ---
 
 ## 1. Architectural Security & The AI Trust Boundary
 
-The core security principle of Comp Copilot is the **prevention of AI hallucinations in financial calculations**. Financial calculations (CTC adjustments, tax computations, PF contributions, gratuity, and cost-of-living adjustments) have real-world consequences and must be 100% deterministic.
+The core security principle of ClearCTC is the **prevention of AI hallucinations in financial calculations**. Financial calculations (CTC adjustments, tax computations, PF contributions, gratuity, and cost-of-living adjustments) have real-world consequences and must be 100% deterministic.
 
 > [!IMPORTANT]
 > **The LLM (Gemini/Claude) is strictly an analytical engine. It reasons and explains over deterministic figures, but it NEVER originates, computes, or alters financial data.**
@@ -34,17 +34,17 @@ sequenceDiagram
 ```
 
 ### Safety Controls
-1. **Deterministic Computation First**: All financial logic resides in [CompensationService](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/core/compensation/compensation.service.ts) as pure, synchronously testable functions.
+1. **Deterministic Computation First**: All financial logic resides in [CompensationService](clearctc/backend/src/core/compensation/compensation.service.ts) as pure, synchronously testable functions.
 2. **Snapshot-Driven Prompts**: The AI prompt includes the already-computed `OfferSnapshot`. The LLM is never given raw variables to perform arithmetic.
-3. **Response Schema Validation**: The AI response is parsed and validated by the backend [OfferComparisonService](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/features/offer-comparison/offer-comparison.service.ts):
+3. **Response Schema Validation**: The AI response is parsed and validated by the backend [OfferComparisonService](clearctc/backend/src/features/offer-comparison/offer-comparison.service.ts):
    - All scores must be integers strictly within `0–100`.
    - Percentage breakdowns must sum to `100 ± 1`.
    - The selected `bestOffer` must match one of the candidate company names exactly.
-4. **Fail-Closed Filter**: If the AI response fails validation or is malformed, [AiExceptionFilter](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/shared/filters/ai-exception.filter.ts) intercepts the error, logs the raw output, and returns an HTTP `502 Bad Gateway`. No raw or unvalidated AI output ever reaches the client.
+4. **Fail-Closed Filter**: If the AI response fails validation or is malformed, [AiExceptionFilter](clearctc/backend/src/shared/filters/ai-exception.filter.ts) intercepts the error, logs the raw output, and returns an HTTP `502 Bad Gateway`. No raw or unvalidated AI output ever reaches the client.
 
 ### Local LLM Execution via Ollama for Data Privacy
 
-To support environments with strict data privacy guidelines, Comp Copilot offers integration with **Ollama** for running LLMs locally.
+To support environments with strict data privacy guidelines, ClearCTC offers integration with **Ollama** for running LLMs locally.
 
 - **Zero-Cloud Trust Model**: For users or organizations where salary data, offer terms, or company evaluations cannot be sent to third-party providers (like Google Gemini, Anthropic Claude, or OpenAI), Ollama executes open models (such as `llama3` or `gemma`) entirely on the local development or hosting machine.
 - **No Data Shared with External Vendors**: Data never leaves the trust boundary of the local server. Prompts, numerical computations, and evaluations remain local and private, avoiding API logging or model-training telemetry by external cloud vendors.
@@ -54,24 +54,24 @@ To support environments with strict data privacy guidelines, Comp Copilot offers
 
 ## 2. Authentication & Session Lifecycle
 
-Comp Copilot implements a secure stateless authentication mechanism designed to minimize the client-side attack surface.
+ClearCTC implements a secure stateless authentication mechanism designed to minimize the client-side attack surface.
 
 ### Token Issuance
-Tokens are issued by the [AuthService](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/features/auth/auth.service.ts) after verifying the email and password hash.
+Tokens are issued by the [AuthService](clearctc/backend/src/features/auth/auth.service.ts) after verifying the email and password hash.
 - **Hashing**: Passwords are encrypted using `bcryptjs` with **12 salt rounds** (~250ms computation delay per check to prevent offline brute-forcing).
 - **Payload**: The token payload contains only the user ID (`sub`) and the email.
-- **Verification**: A global [JwtAuthGuard](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/shared/guards/jwt-auth.guard.ts) intercepts and validates incoming requests. Routes can explicitly opt out using the `@Public()` decorator.
+- **Verification**: A global [JwtAuthGuard](clearctc/backend/src/shared/guards/jwt-auth.guard.ts) intercepts and validates incoming requests. Routes can explicitly opt out using the `@Public()` decorator.
 
 ### In-Memory Token Storage (Hard Constraint)
-To mitigate Cross-Site Scripting (XSS) attacks, Comp Copilot implements a strict client-side storage policy:
+To mitigate Cross-Site Scripting (XSS) attacks, ClearCTC implements a strict client-side storage policy:
 
 > [!WARNING]
 > **JWT Access Tokens live strictly in React memory state.**
 > The token is never stored in `localStorage`, `sessionStorage`, or `IndexedDB`.
 
-- **Security Benefit**: Browser storage APIs are globally accessible to any script running on the origin (including malicious third-party scripts or XSS payloads). By keeping the token in local React memory state ([AuthContext.tsx](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/web/src/context/AuthContext.tsx)), the token is purged immediately when the page is reloaded, making token extraction much more difficult.
+- **Security Benefit**: Browser storage APIs are globally accessible to any script running on the origin (including malicious third-party scripts or XSS payloads). By keeping the token in local React memory state ([AuthContext.tsx](clearctc/web/src/context/AuthContext.tsx)), the token is purged immediately when the page is reloaded, making token extraction much more difficult.
 - **UX Trade-off**: Refreshing the browser or opening the app in a new tab terminates the session, requiring the user to log in again.
-- **API Fetch Wrapper**: The frontend uses a custom hook [useApiFetch.ts](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/web/src/hooks/useApiFetch.ts) to inject the `Authorization: Bearer <token>` header dynamically and automatically signs the user out if a `401 Unauthorized` response is received.
+- **API Fetch Wrapper**: The frontend uses a custom hook [useApiFetch.ts](clearctc/web/src/hooks/useApiFetch.ts) to inject the `Authorization: Bearer <token>` header dynamically and automatically signs the user out if a `401 Unauthorized` response is received.
 
 ---
 
@@ -90,7 +90,7 @@ All sensitive configurations and credentials are kept strictly isolated from the
 ### Environment Isolation Rules
 - **No Hardcoded Secrets**: Secrets are never hardcoded or committed to git.
 - **Example Environments**: The repository contains `.env.example` templates containing safe mock variables.
-- **Git Ignore**: The actual `.env` file is explicitly ignored in [.gitignore](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/.gitignore). Run this command to verify isolation:
+- **Git Ignore**: The actual `.env` file is explicitly ignored in [.gitignore](clearctc/.gitignore). Run this command to verify isolation:
   ```bash
   git check-ignore -v backend/.env
   ```
@@ -102,7 +102,7 @@ All sensitive configurations and credentials are kept strictly isolated from the
 All incoming HTTP requests are validated at the entry boundary before executing controller logic.
 
 - **Class Validators**: Request DTOs are annotated with `class-validator` decorators (e.g. `@IsEmail()`, `@IsString()`, `@MaxLength(200)`).
-- **NestJS ValidationPipe**: Configured globally in [main.ts](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/main.ts):
+- **NestJS ValidationPipe**: Configured globally in [main.ts](clearctc/backend/src/main.ts):
   ```typescript
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
@@ -120,11 +120,11 @@ During our review of the application source code, we identified two notable secu
 
 ### Finding 1: Rate Limiter Error Message Discrepancy (Medium Priority)
 In the backend, the rate limiting throttler is configured to allow `3 requests per 60 seconds` (1 minute) for AI routes:
-- **Configuration ([app.module.ts](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/app.module.ts))**:
+- **Configuration ([app.module.ts](clearctc/backend/src/app.module.ts))**:
   ```typescript
   ThrottlerModule.forRoot([{ name: 'ai', ttl: 60_000, limit: 3 }])
   ```
-- **Error Response ([ai-throttler.guard.ts](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/shared/guards/ai-throttler.guard.ts))**:
+- **Error Response ([ai-throttler.guard.ts](clearctc/backend/src/shared/guards/ai-throttler.guard.ts))**:
   ```typescript
   protected async getErrorMessage(): Promise<string> {
     return 'AI rate limit exceeded: maximum 3 requests per hour. Please try again later.';
@@ -134,7 +134,7 @@ In the backend, the rate limiting throttler is configured to allow `3 requests p
 - **Remediation**: Update the error message in the guard to read `"AI rate limit exceeded: maximum 3 requests per minute. Please try again later."` to match the configuration.
 
 ### Finding 2: Admin Endpoint Timing Attack Risk (Low Priority)
-Admin endpoints (e.g. `/api/v1/city-expenses/refresh`) are protected by [AdminGuard](file:///Users/calibraint_1/Documents/personal-tools/comp-copilot/backend/src/shared/guards/admin.guard.ts), which performs a standard string equality comparison:
+Admin endpoints (e.g. `/api/v1/city-expenses/refresh`) are protected by [AdminGuard](clearctc/backend/src/shared/guards/admin.guard.ts), which performs a standard string equality comparison:
 - **Code**:
   ```typescript
   return req.headers['x-admin-token'] === adminToken;

@@ -1,11 +1,11 @@
 groups:
-  - name: comp-copilot
+  - name: clearctc
     rules:
       - alert: HighErrorRate
         expr: |
-          sum(rate(comp_copilot_http_requests_total{status=~"5.."}[2m]))
+          sum(rate(clearctc_http_requests_total{status=~"5.."}[2m]))
           /
-          sum(rate(comp_copilot_http_requests_total[2m])) > 0.05
+          sum(rate(clearctc_http_requests_total[2m])) > 0.05
         for: 2m
         labels:
           severity: critical
@@ -15,7 +15,7 @@ groups:
       - alert: HighP95Latency
         expr: |
           histogram_quantile(0.95,
-            sum(rate(comp_copilot_http_duration_seconds_bucket[5m])) by (le)
+            sum(rate(clearctc_http_duration_seconds_bucket[5m])) by (le)
           ) > 2
         for: 2m
         labels:
@@ -26,7 +26,7 @@ groups:
       - alert: GeminiQuotaExhausted
         expr: |
           count_over_time(
-            {app="comp-copilot"} |= "[GEMINI_QUOTA_EXHAUSTED]" [5m]
+            {app="clearctc"} |= "[GEMINI_QUOTA_EXHAUSTED]" [5m]
           ) > 0
         labels:
           severity: critical
@@ -35,8 +35,8 @@ groups:
 
       - alert: ProcessRestarted
         expr: |
-          increase(process_start_time_seconds{job="comp-copilot-backend"}[5m]) > 0
+          increase(process_start_time_seconds{job="clearctc-backend"}[5m]) > 0
         labels:
           severity: warning
         annotations:
-          summary: "comp-copilot backend process restarted"
+          summary: "clearctc backend process restarted"

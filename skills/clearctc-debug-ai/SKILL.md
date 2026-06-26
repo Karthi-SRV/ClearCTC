@@ -1,8 +1,8 @@
-# comp-copilot-debug-ai
+# clearctc-debug-ai
 
-Debugging guide for AI pipeline issues in comp-copilot: validation failures, quota exhaustion, provider switching, and the trust-boundary contract. Use this skill when an AI-related bug surfaces in development or production.
+Debugging guide for AI pipeline issues in clearctc: validation failures, quota exhaustion, provider switching, and the trust-boundary contract. Use this skill when an AI-related bug surfaces in development or production.
 
-**Trigger:** `/comp-copilot-debug-ai`
+**Trigger:** `/clearctc-debug-ai`
 
 ---
 
