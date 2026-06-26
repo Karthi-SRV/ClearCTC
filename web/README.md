@@ -1,6 +1,6 @@
-# Comp Copilot — Frontend
+# ClearCTC — Frontend
 
-React SPA for the Comp Copilot compensation tool. Helps Indian software engineers evaluate city-adjusted salaries before HR conversations and compare real job offers on actual take-home pay.
+React SPA for the ClearCTC compensation tool. Helps Indian software engineers evaluate city-adjusted salaries before HR conversations and compare real job offers on actual take-home pay.
 
 ## Tech Stack
 

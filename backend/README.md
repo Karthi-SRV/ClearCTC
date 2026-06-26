@@ -1,6 +1,6 @@
-# Comp Copilot — Backend
+# ClearCTC — Backend
 
-NestJS API server for the Comp Copilot compensation tool. Handles salary math, offer comparison, city living-cost data, authentication, and all AI calls.
+NestJS API server for the ClearCTC compensation tool. Handles salary math, offer comparison, city living-cost data, authentication, and all AI calls.
 
 ## Tech Stack
 

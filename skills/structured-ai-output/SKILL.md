@@ -52,7 +52,7 @@ Higher temperature increases creative variation — harmful for JSON compliance.
 
 ---
 
-## The three AI calls in Paisa Sahi
+## The three AI calls in ClearCTC
 
 ### 1. City expense breakdown (CityExpenseFetchService)
 

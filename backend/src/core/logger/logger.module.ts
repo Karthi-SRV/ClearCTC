@@ -29,7 +29,7 @@ const consoleFormat = winston.format.combine(
             new LokiTransport({
               host: lokiUrl,
               labels: {
-                app: 'comp-copilot',
+                app: 'clearctc',
                 env: config.get<string>('NODE_ENV', 'development'),
               },
               format: winston.format.json(),

@@ -1,7 +1,7 @@
 {
-  "uid": "comp-copilot-main",
-  "title": "Comp Copilot",
-  "tags": ["comp-copilot"],
+  "uid": "clearctc-main",
+  "title": "ClearCTC",
+  "tags": ["clearctc"],
   "timezone": "browser",
   "schemaVersion": 38,
   "version": 1,
@@ -58,7 +58,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(increase(comp_copilot_http_requests_total[$__range]))",
+          "expr": "sum(increase(clearctc_http_requests_total[$__range]))",
           "legendFormat": "",
           "refId": "A",
           "instant": true
@@ -94,7 +94,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(comp_copilot_http_requests_total[$__rate_interval]))",
+          "expr": "sum(rate(clearctc_http_requests_total[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A",
           "instant": true
@@ -134,7 +134,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(comp_copilot_http_requests_total{status=~\"5..\"}[$__rate_interval])) / sum(rate(comp_copilot_http_requests_total[$__rate_interval])) * 100",
+          "expr": "sum(rate(clearctc_http_requests_total{status=~\"5..\"}[$__rate_interval])) / sum(rate(clearctc_http_requests_total[$__rate_interval])) * 100",
           "legendFormat": "",
           "refId": "A",
           "instant": true
@@ -174,7 +174,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(comp_copilot_http_duration_seconds_bucket[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(clearctc_http_duration_seconds_bucket[$__rate_interval])))",
           "legendFormat": "",
           "refId": "A",
           "instant": true
@@ -213,7 +213,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "comp_copilot_nodejs_heap_size_used_bytes",
+          "expr": "clearctc_nodejs_heap_size_used_bytes",
           "legendFormat": "",
           "refId": "A",
           "instant": true
@@ -253,7 +253,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "rate(comp_copilot_process_cpu_seconds_total[$__rate_interval]) * 100",
+          "expr": "rate(clearctc_process_cpu_seconds_total[$__rate_interval]) * 100",
           "legendFormat": "",
           "refId": "A",
           "instant": true
@@ -284,7 +284,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum by (route) (rate(comp_copilot_http_requests_total[$__rate_interval]))",
+          "expr": "sum by (route) (rate(clearctc_http_requests_total[$__rate_interval]))",
           "legendFormat": "{{route}}",
           "refId": "A"
         }
@@ -320,19 +320,19 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(comp_copilot_http_requests_total{status=~\"2..\"}[$__rate_interval]))",
+          "expr": "sum(rate(clearctc_http_requests_total{status=~\"2..\"}[$__rate_interval]))",
           "legendFormat": "2xx",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(comp_copilot_http_requests_total{status=~\"4..\"}[$__rate_interval]))",
+          "expr": "sum(rate(clearctc_http_requests_total{status=~\"4..\"}[$__rate_interval]))",
           "legendFormat": "4xx",
           "refId": "B"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(comp_copilot_http_requests_total{status=~\"5..\"}[$__rate_interval]))",
+          "expr": "sum(rate(clearctc_http_requests_total{status=~\"5..\"}[$__rate_interval]))",
           "legendFormat": "5xx",
           "refId": "C"
         }
@@ -367,19 +367,19 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(comp_copilot_http_duration_seconds_bucket[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(clearctc_http_duration_seconds_bucket[$__rate_interval])))",
           "legendFormat": "P50",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(comp_copilot_http_duration_seconds_bucket[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(clearctc_http_duration_seconds_bucket[$__rate_interval])))",
           "legendFormat": "P95",
           "refId": "B"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(comp_copilot_http_duration_seconds_bucket[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(clearctc_http_duration_seconds_bucket[$__rate_interval])))",
           "legendFormat": "P99",
           "refId": "C"
         }
@@ -419,13 +419,13 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "comp_copilot_nodejs_heap_size_used_bytes",
+          "expr": "clearctc_nodejs_heap_size_used_bytes",
           "legendFormat": "Used",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "comp_copilot_nodejs_heap_size_total_bytes",
+          "expr": "clearctc_nodejs_heap_size_total_bytes",
           "legendFormat": "Total",
           "refId": "B"
         }
@@ -466,7 +466,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "rate(comp_copilot_process_cpu_seconds_total[$__rate_interval]) * 100",
+          "expr": "rate(clearctc_process_cpu_seconds_total[$__rate_interval]) * 100",
           "legendFormat": "CPU %",
           "refId": "A"
         }
@@ -505,13 +505,13 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "comp_copilot_nodejs_eventloop_lag_mean_seconds",
+          "expr": "clearctc_nodejs_eventloop_lag_mean_seconds",
           "legendFormat": "Mean",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "comp_copilot_nodejs_eventloop_lag_max_seconds",
+          "expr": "clearctc_nodejs_eventloop_lag_max_seconds",
           "legendFormat": "Max",
           "refId": "B"
         }
@@ -537,7 +537,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${loki}" },
-          "expr": "{app=\"comp-copilot\"}",
+          "expr": "{app=\"clearctc\"}",
           "legendFormat": "",
           "refId": "A"
         }

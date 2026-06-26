@@ -125,9 +125,9 @@ Skills are Markdown knowledge modules in `skills/`. Load one with its trigger co
 |---------|-------------|
 | `/indian-payroll-math` | Reviewing, testing, or extending `CompensationService`; verifying snapshot values |
 | `/graphify` | Map the codebase as a knowledge graph; query trust-boundary enforcement across files |
-| `/comp-copilot-devstack` | Starting the local stack, running tests, seeding data |
-| `/comp-copilot-debug-ai` | Debugging 502s, quota exhaustion, provider switching |
-| `/comp-copilot-new-city` | Adding a new Indian city to the expense system |
+| `/clearctc-devstack` | Starting the local stack, running tests, seeding data |
+| `/clearctc-debug-ai` | Debugging 502s, quota exhaustion, provider switching |
+| `/clearctc-new-city` | Adding a new Indian city to the expense system |
 | `/ai-provider-strategy` | Adding a new AI provider or a new AI call site |
 | `/nestjs-three-layer-cache` | Adding a new cached data type or debugging stale-data issues |
 | `/structured-ai-output` | Writing a new AI prompt or adding a validation rule |

@@ -1,15 +1,15 @@
-# comp-copilot-devstack
+# clearctc-devstack
 
-Local development quick-start for the comp-copilot monorepo. Use this skill when the user asks how to run the app, restart services, run tests, or seed data.
+Local development quick-start for the clearctc monorepo. Use this skill when the user asks how to run the app, restart services, run tests, or seed data.
 
-**Trigger:** `/comp-copilot-devstack`
+**Trigger:** `/clearctc-devstack`
 
 ---
 
 ## Repository layout
 
 ```
-comp-copilot/
+clearctc/
 ├── backend/          NestJS API — port 3000
 ├── web/              React (Vite) frontend — port 5173
 ├── scripts/          seed.ts (companies + cities), infra.sh
@@ -30,7 +30,7 @@ Working directory for all frontend commands: `web/`
 
 Minimum required env vars:
 ```
-MONGODB_URI=mongodb://localhost:27017/comp-copilot
+MONGODB_URI=mongodb://localhost:27017/clearctc
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=<any-long-random-string>
 GEMINI_API_KEY=<from-aistudio.google.com>
